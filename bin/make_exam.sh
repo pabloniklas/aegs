@@ -1,7 +1,8 @@
 #!/bin/bash
 #######################################################################
 #
-# Exam questions generator - By Pablo S.R. NIKLAS
+# Exam questions generator
+# By Pablo S.R. NIKLAS <pablo.niklas@gmail.com>
 # Under MIT License.
 #
 #######################################################################
