@@ -38,6 +38,11 @@ All the questions are in a frequency table in order to minimize the posibility o
 000000:../towrite/0101.tex:1000000:.007246:.007246:1:72
 ```
 
+## Questions
+
+The questions are in LaTex format. An example is provided for each type.
+The filename structure is in the format ```<unit><ordinal number>.tex```.
+
 ## Usage
 
 *  ```help```             Help.
