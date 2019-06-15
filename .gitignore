@@ -1,0 +1,5 @@
+bin/make_exam.ini
+*.pdf
+*.bkp
+*.ini
+*.db
