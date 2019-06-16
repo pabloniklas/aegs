@@ -41,7 +41,10 @@ All the questions are in a frequency table in order to minimize the posibility o
 ## Questions
 
 The questions are in LaTex format. An example is provided for each type.
-The filename structure is in the format ```<unit><ordinal number>.tex```.
+The filename structure is in the format ```UU99.tex```.
+
+* U: Subject Unit corresponding.
+* 9: Ordinal.
 
 ## Usage
 
