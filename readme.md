@@ -46,6 +46,11 @@ The filename structure is in the format ```UU99.tex```.
 * U: Unit (academic module) that is related to the question.
 * 9: Cardinal.
 
+### Example
+
+* 1st question of 1st unit: ```0101.tex```
+* 2nd question of 1st unit: ```0102.tex```
+
 ## Usage
 
 *  ```help```             Help.
