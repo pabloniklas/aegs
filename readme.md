@@ -54,7 +54,7 @@ The filename structure is in the format ```UU99.tex```.
 ## Usage
 
 *  ```help```             Help.
-*  ```create-exam```       Create the latex files, ready to print.
+*  ```create-exam```       Create the exam in pdf format, ready to print.
 *  ```choose-questions```  Choose questions WITHOUT creating the exam.
 *  ```pick```             Pick one question. Just to test the random system.
 *  ```showdb```           Show some minor statistics of the DB.
