@@ -5,7 +5,7 @@
 This script creates an exam in PDF format, taken randomly questions classified by type of question (fillin, multiplechoice, towrite and truefalse) and unit of the subject to be evaluated.
 All the questions are in a frequency table in order to minimize the posibility of a questions that has been taken a couple of times.
 
-## Installation structure
+# Installation structure
 
 ```
 
@@ -24,21 +24,21 @@ All the questions are in a frequency table in order to minimize the posibility o
 
 *  __make_exam.sh__: Main binary.
 *  __make_exam.ini__: INI config file. It will be created if it doesn't exists. 
-*  __CQstats.db__: Statistic file. Here lies all the questions and it's probability to be taken. 
+*  __CQstats.db__: Statistic file. Here are all the questions and it's probability to be taken. It will be created if it doesn't exists, scanning all the questions files and calculating it's probability (that are the same when the file is created).
 
-## Statfile structure
+# Statfile structure
 
-### Format
+## Format
 ```
 <ID>:<tex file with the question>:<number of free usage>:<probability>:<lower limit>:<upper limit>
 ```
 
-### Example
+## Example
 ```
 000000:../towrite/0101.tex:1000000:.007246:.007246:1:72
 ```
 
-## Questions
+# Questions
 
 The questions are in LaTex format. An example is provided for each type.
 The filename structure is in the format ```UU99.tex```.
@@ -46,12 +46,12 @@ The filename structure is in the format ```UU99.tex```.
 * U: Unit (academic module) that is related to the question.
 * 9: Cardinal.
 
-### Example
+## Example
 
 * 1st question of 1st unit: ```0101.tex```
 * 2nd question of 1st unit: ```0102.tex```
 
-## Usage
+# Usage
 
 *  ```help```             Help.
 *  ```create-exam```       Create the exam in pdf format, ready to print.
@@ -59,19 +59,19 @@ The filename structure is in the format ```UU99.tex```.
 *  ```pick```             Pick one question. Just to test the random system.
 *  ```showdb```           Show some minor statistics of the DB.
 
-### showdb
+## showdb
 
 ```
 $ make_exam.sh -showdb
 ```
 
-#### Example
+### Example
 
 ```bash
 $ make_exam.sh -showdb
 ```
 
-### choose-questions
+## choose-questions
 
 Choose the questions without creating the PDF.
 
@@ -79,13 +79,13 @@ Choose the questions without creating the PDF.
 make_exam.sh -choose-questions -t <type of question> -u <list of units> -q <number of questions>
 ```
 
-#### Example
+### Example
 
 ```
 make_exam.sh -choose-questions -t fillin -u 3,10 -q 3
 ```
 
-### create-exam
+## create-exam
 
 Creates the exam, the ouput is in PDF format.
 
@@ -93,20 +93,24 @@ Creates the exam, the ouput is in PDF format.
 make_exam.sh -create-exam  -t <type of question> -u <list of units> -q <number of questions>
 ```
 
-#### Example
+### Example
 
 ```
 make_exam.sh -create-exam -t fillin,truefalse,multiplechoice -u 1,2,3,4,5,6 -q 3
 ```
 
-### pick
+## pick
 
 ```
 make_exam.sh -pick
 ```
 
-#### Example
+### Example
 
 ```
 make_exam.sh -pick
 ```
+
+# License
+
+MIT
