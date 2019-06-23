@@ -18,6 +18,8 @@ All the questions are in a frequency table in order to minimize the posibility o
         +-------------- /towrite: writing questions.
         |
         +-------------- /truefalse: truefalse questions.
+        |
+        +-------------- /examples: misc. examples.
 ```
 
 ## Files
