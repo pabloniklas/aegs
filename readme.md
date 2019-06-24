@@ -24,8 +24,8 @@ All the questions are in a frequency table in order to minimize the posibility o
 
 ## Files
 
-*  __make_exam.sh__: Main binary.
-*  __make_exam.ini__: INI config file. It will be created if it doesn't exists. 
+*  __aegs__: Main binary.
+*  __aegs.ini__: INI config file. It will be created if it doesn't exists. 
 *  __CQstats.db__: Statistic file. Here are all the questions and it's probability to be taken. It will be created if it doesn't exists, scanning all the questions files and calculating it's probability (that are the same when the file is created).
 
 # Statfile structure
@@ -64,13 +64,13 @@ The filename structure is in the format ```UU99.tex```.
 ## showdb
 
 ```
-$ make_exam.sh -showdb
+$ aegs -showdb
 ```
 
 ### Example
 
 ```bash
-$ make_exam.sh -showdb
+$ aegs -showdb
 ```
 
 ## choose-questions
@@ -78,13 +78,13 @@ $ make_exam.sh -showdb
 Choose the questions without creating the PDF.
 
 ```
-make_exam.sh -choose-questions -t <type of question> -u <list of units> -q <number of questions>
+aegs -choose-questions -t <type of question> -u <list of units> -q <number of questions>
 ```
 
 ### Example
 
 ```
-make_exam.sh -choose-questions -t fillin -u 3,10 -q 3
+aegs -choose-questions -t fillin -u 3,10 -q 3
 ```
 
 ## create-exam
@@ -92,25 +92,25 @@ make_exam.sh -choose-questions -t fillin -u 3,10 -q 3
 Creates the exam, the ouput is in PDF format.
 
 ```
-make_exam.sh -create-exam  -t <type of question> -u <list of units> -q <number of questions>
+aegs -create-exam  -t <type of question> -u <list of units> -q <number of questions>
 ```
 
 ### Example
 
 ```
-make_exam.sh -create-exam -t fillin,truefalse,multiplechoice -u 1,2,3,4,5,6 -q 3
+aegs -create-exam -t fillin,truefalse,multiplechoice -u 1,2,3,4,5,6 -q 3
 ```
 
 ## pick
 
 ```
-make_exam.sh -pick
+aegs -pick
 ```
 
 ### Example
 
 ```
-make_exam.sh -pick
+aegs -pick
 ```
 
 # License
