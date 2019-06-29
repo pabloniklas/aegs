@@ -168,7 +168,7 @@ function loadDB {
     unset LABEL[$POINTER] TEXFILE[$POINTER] QCREM[$POINTER] \
                         STATS[$POINTER] FDA[$POINTER] LI[$POINTER] LS[$POINTER]; 
 
-    showOK "File loaded OK."
+    showOK "File loaded OK. ${#LABEL[@]} questions loaded."
 
 }
 
@@ -229,6 +229,8 @@ function showDB {
 ### initStatFile
 function initStatFile() {
 
+    MY_PATH="`dirname $0`"
+
     if [ ! -f $STATSFILE ]; then
 
         showWarning "Stats File is being created."
@@ -241,11 +243,14 @@ function initStatFile() {
 
         REGNUM=0
         for P in ${DB_PATH[@]}; do
-            for F in $(find $P -type f|sort); do
+            showInfo "DB: $P"
+            for F in $(find $MY_PATH/$P/ -type f |sort); do
+                showInfo "   File: $F added"
                 echo `printf %.6d $REGNUM`:$F:1000000 >> $STATSFILE
                 REGNUM=$(($REGNUM+1))
             done
         done
+        showOK "Done and saved."
 
         loadDB
         calculateFrecuencies
@@ -526,11 +531,19 @@ LATEX1
 )  > exam_01_$$.tex
 
     # Replace values in template. I've splitted the sed sentences for a better readbility.
-    LOGO_PATH="`echo $LOGO_PATH|sed 's/\./\\\./g;s/\//\\\\\//g'`"
-    sed -i "s/%%TEACHER_NAME%%/$TEACHER_NAME/;s/%%EXAM_DATE%%/$EXAM_DATE/;s/%%COURSE_TITLE%%/$COURSE_TITLE/" exam_01_$$.tex
-    sed -i "s/%%EXAM_TYPE%%/$EXAM_TYPE/;s/%%LOGO_PATH%%/$LOGO_PATH/;s/%%UNIVERSITY%%/$UNIVERSITY/" exam_01_$$.tex
-    sed -i "s/%%DEPARTMENT%%/$DEPARTMENT/" exam_01_$$.tex
 
+    [ -z "$TEACHER_NAME" ] && showWarning "Teacher's name is blank."
+    [ -z "$EXAM_DATE" ] && showWarning "Exam date is blank."
+    [ -z "$COURSE_TITLE" ] && showWarning "Curse Title is blank."
+    sed -i "s/%%TEACHER_NAME%%/$TEACHER_NAME/;s/%%EXAM_DATE%%/$EXAM_DATE/;s/%%COURSE_TITLE%%/$COURSE_TITLE/" exam_01_$$.tex
+    [ -z "$EXAM_TYPE" ] && showWarning "Exam Type is blank."
+    [ -z "$LOGO_PATH" ] && showWarning "Logo Path is blank."
+    [ -z "$UNIVERSITY" ] && showWarning "University is blank."
+    [ ! -f $LOGO_PATH ] && showError "The logo file $LOGO_FILE doesn't exist."
+    LOGO_PATH="`echo $LOGO_PATH|sed 's/\./\\\./g;s/\//\\\\\//g'`"
+    sed -i "s/%%EXAM_TYPE%%/$EXAM_TYPE/;s/%%LOGO_PATH%%/$LOGO_PATH/;s/%%UNIVERSITY%%/$UNIVERSITY/" exam_01_$$.tex
+    [ -z "$DEPARTMENT" ] && showWarning "Department is blank."
+    sed -i "s/%%DEPARTMENT%%/$DEPARTMENT/" exam_01_$$.tex
 }
 
 function createEndLatex {
@@ -681,10 +694,10 @@ function chooseQuestions() {
             # Search pool of questions giving UNIT and TABLE.
             POINTER=0; unset QUESTIONS_POOL
             for ((A=0 ; A<${#TEXFILE[@]} ; A++)); do
-                U="`echo ${TEXFILE[$A]}|cut -d/ -f3|cut -d. -f1`"
-                U=${U:0:2}  # substring
-                T="`echo ${TEXFILE[$A]}|cut -d/ -f2`"
-
+                #U="`echo ${TEXFILE[$A]}|cut -d/ -f3|cut -d. -f1`"
+                U="`echo ${TEXFILE[$A]##*/}|cut -d. -f1`"
+                U=${U:0:2}  # substrin
+                T="`echo ${TEXFILE[$A]}|awk -F/ '{print $(NF-1)}'`"
                 if [[ $U == $UNIT ]] && [[ $T == $TABLE ]]; then
                     QUESTIONS_POOL[$POINTER]=${LABEL[$A]} # Getting the ID.
                     POINTER=$(($POINTER+1))
@@ -708,7 +721,7 @@ function chooseQuestions() {
                     
                 done
 
-                showInfo "Limits: $LIa -- $LSa"     # <------------ OK
+                showInfo "Limits: $LIa -- $LSa"     
 
                 showInfo "------------------------------------------------------------"
 
@@ -783,11 +796,11 @@ function createMidLatex() {
             ID=${CHOOSEN_QUESTIONS[$F]}
             ID=${ID##+(0)}
 
-            FILE=${TEXFILE[$ID]}
+            FILE=${TEXFILE[$ID]##*/}
 
-            if [[ $T == "`echo $FILE|cut -d/ -f2`" ]]; then
+            if [[ $T == "`echo ${TEXFILE[$ID]}|awk -F/ '{print $(NF-1)}'`" ]]; then
                 showInfo "   * $FILE"
-                cat $FILE >> exam_02_$$.tex
+                cat ${TEXFILE[$ID]} >> exam_02_$$.tex
                 echo >> exam_02_$$.tex
             fi 
         done
@@ -809,6 +822,8 @@ if [ ! -f `dirname $0`/aegs.ini ]; then
 #             C O N F I G   F I L E                #
 #                                                  #
 ####################################################
+
+# Don't leave empty this fields. And don't use "/".
 
 TEACHER_NAME="Pablo Niklas"
 EXAM_DATE="January 4th, 1974"
