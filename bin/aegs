@@ -16,6 +16,7 @@
 #              PSRN - Config file.
 # 15/06/2019 - PSRN - Fix checkdb.
 # 24/06/2019 - PSRN - Rename.
+# 28/06/2019 - PSRN - Several fixes.
 # 
 
 #######################################################################
@@ -150,10 +151,12 @@ function showHeader {
 ### loadDB
 function loadDB {
 
+    MY_PATH="`dirname $0`"
+
     showInfo "Loading DB file from disk into memory."
 
     QFILE=/tmp/$STATSFILE.$$
-    grep -v \# $STATSFILE > $QFILE 
+    grep -v \# $MY_PATH/$STATSFILE > $QFILE 
 
     POINTER=0
 
@@ -175,6 +178,8 @@ function loadDB {
 ### saveDB
 function saveDB {
 
+    MY_PATH="`dirname $0`"
+
     showInfo "Saving DB from memory to disk..."
 
     rm -f sedfile
@@ -187,9 +192,10 @@ function saveDB {
         echo "s/`printf %.6d $A`:.*/$UPD_LINE/" >> sedfile
     done
 
-    sed -i -f sedfile $STATSFILE
-    showOK "Done."
+    sed -i -f sedfile $MY_PATH/$STATSFILE
+
     rm -f sedfile
+    showOK "Done."
 }
 
 
@@ -231,22 +237,22 @@ function initStatFile() {
 
     MY_PATH="`dirname $0`"
 
-    if [ ! -f $STATSFILE ]; then
+    if [ ! -f $MY_PATH/$STATSFILE ]; then
 
         showWarning "Stats File is being created."
 
-        echo "#######################################" >> $STATSFILE
-        echo "# STATSFILE: DO NOT EDIT              #" >> $STATSFILE
-        echo "#                                     #" >> $STATSFILE
-        echo "# (Unless you know what you're doing) #" >> $STATSFILE
-        echo "#######################################" >> $STATSFILE
+        echo "#######################################" >> $MY_PATH/$STATSFILE
+        echo "# STATSFILE: DO NOT EDIT              #" >> $MY_PATH/$STATSFILE
+        echo "#                                     #" >> $MY_PATH/$STATSFILE
+        echo "# (Unless you know what you're doing) #" >> $MY_PATH/$STATSFILE
+        echo "#######################################" >> $MY_PATH/$STATSFILE
 
         REGNUM=0
         for P in ${DB_PATH[@]}; do
             showInfo "DB: $P"
             for F in $(find $MY_PATH/$P/ -type f |sort); do
                 showInfo "   File: $F added"
-                echo `printf %.6d $REGNUM`:$F:1000000 >> $STATSFILE
+                echo `printf %.6d $REGNUM`:$F:1000000 >> $MY_PATH/$STATSFILE
                 REGNUM=$(($REGNUM+1))
             done
         done
