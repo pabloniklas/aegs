@@ -17,7 +17,8 @@
 # 15/06/2019 - PSRN - Fix checkdb.
 # 24/06/2019 - PSRN - Rename.
 # 28/06/2019 - PSRN - Several fixes.
-# 
+# 30/06/2019 - PSRN - Overrides Exam Title. 
+#
 
 #######################################################################
 #######################################################################
@@ -878,12 +879,24 @@ cat <<EOF
 USAGE:
 aegs.sh -help:             This help.
              -create-exam       Create the latex files, ready to print.
+                -u: units.
+                -d: override Exam Title.
+                -t: db to be used.
+                -q: number of questions by db and unit.
+
              -choose-questions  Choose questions WITHOUT creating the exam.
              -pick:             Pick one question. Just to test the random system.
              -showdb:           Show some minor statistics of the questions DB.
 EOF
 
     exit 0
+}
+
+# TODO: Autodetect update.
+function checkUpdateGIT {
+
+    LINES=`git diff 2>/dev/null |wc -l`
+
 }
 #######################################################################
 #                          MAIN PROCESS                               #
@@ -932,6 +945,10 @@ while [ ! -z "$1" ]; do
                                             done
                                         fi
                                     done
+                                    ;;
+
+                            "x-d")  shift
+                                    EXAM_TYPE="$1"
                                     ;;
 
                             "x-q")  shift
