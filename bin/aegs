@@ -18,6 +18,7 @@
 # 24/06/2019 - PSRN - Rename.
 # 28/06/2019 - PSRN - Several fixes.
 # 30/06/2019 - PSRN - Overrides Exam Title. 
+# 03/07/2019 - PSRN - Shuffle the options in multiplechoice questions.
 #
 
 #######################################################################
@@ -143,7 +144,7 @@ function showHeader {
 
     echo
     showInfo "##########################################################"
-    showInfo "                Exam generator. By PN."
+    showInfo "        Exam generator :: By pablo.niklas@gmail.com"
     showInfo "##########################################################"
     echo
 
@@ -565,17 +566,6 @@ LATEX1
 
 }
 
-### createTemplates
-# function createTemplates {
-
-#     showInfo "Creating empty Templates."
-
-#     createMainLatex
-#     createAuxLatex
-
-#     showOK "Done."
-# }
-
 ### createLatex
 function createLatex() {
 
@@ -778,6 +768,8 @@ function createMidLatex() {
         exit 1
     fi
 
+    SHUFTMPFILE=/tmp/${$}_shufle.txt    # Aux file for the permutations.
+
     showInfo "Creating exam files."
 
     for T in ${TABLES//,/ }; do
@@ -806,7 +798,16 @@ function createMidLatex() {
 
             if [[ $T == "`echo ${TEXFILE[$ID]}|awk -F/ '{print $(NF-1)}'`" ]]; then
                 showInfo "   * $FILE"
-                cat ${TEXFILE[$ID]} >> exam_02_$$.tex
+                if $SHUFFLE && [[ $T == "multiplechoice" ]]; then
+                    showInfo "     (shuffled)"
+                    grep -v '\end' ${TEXFILE[$ID]} | grep -ve '[Cc]hoice' > $SHUFTMPFILE
+                    grep -e '[Cc]hoice' ${TEXFILE[$ID]} | shuf >> $SHUFTMPFILE
+                    echo '\end{oneparcheckboxes}' >> $SHUFTMPFILE
+                    cat $SHUFTMPFILE >> exam_02_$$.tex
+                    rm -f $SHUFTMPFILE
+                else
+                    cat ${TEXFILE[$ID]} >> exam_02_$$.tex
+                fi
                 echo >> exam_02_$$.tex
             fi 
         done
@@ -830,17 +831,18 @@ if [ ! -f `dirname $0`/aegs.ini ]; then
 ####################################################
 
 # Don't leave empty this fields. And don't use "/".
-
 TEACHER_NAME="Pablo Niklas"
 EXAM_DATE="January 4th, 1974"
 COURSE_TITLE="Geography"
 EXAM_TYPE="Elemental test"
 UNIVERSITY="University of United Earth"
 DEPARTMENT="Department of Advanced Weaponry"
+
 LOGO_PATH="../pictures/shield.png"
 
 STATSFILE="CQstats.db"
-QUNITS=1   # Total of units/chapters
+QUNITS=1      # Total of units/chapters
+SHUFFLE=true  # Shufle the options in multiplechoice
 
 # Questions path !! CANNOT CHANGE THE FOLDERS NAME !!
 DB_PATH[0]="../towrite"
@@ -920,6 +922,7 @@ while [ ! -z "$1" ]; do
 
         "x-pick")   showHeader
                     initStatFile       # Create the stat file if it doesn't exist.
+
                     pickQ
                     ;;
 
