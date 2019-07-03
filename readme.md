@@ -39,6 +39,19 @@ All the questions are in a frequency table in order to minimize the posibility o
 ```
 000000:../towrite/0101.tex:1000000:.007246:.007246:1:72
 ```
+# Field description of the .ini file
+
+*  __TEACHER_NAME__: Name of the teacher.
+*  __EXAM_DATE__: Date of the exam.
+*  __COURSE_TITLE__: Name of the course.
+*  __EXAM_TYPE__: Title of the exam.
+*  __UNIVERSITY__: Name of the university.
+*  __DEPARTMENT__: Department's name.
+*  __LOGO_PATH__: Path of the University Logo.
+*  __STATSFILE__: Name of the file who records the statistics of the questions and its frequency.
+*  __QUNITS__: Quantity of units in the subject. 
+*  __SHUFFLE__: If ```true```, shuffle the options in the multiplechoice questions.
+*  __DB_PATH__: Vector of the different questions databases. Classified by type.
 
 # Questions
 
