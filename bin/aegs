@@ -687,7 +687,6 @@ function chooseQuestions() {
     # For each table, we loop.
     for TABLE in ${TABLES//,/ }; do
 
-
         # For each unit, we loop.
         for UNIT in ${UNITS//,/ }; do
 
@@ -785,10 +784,10 @@ function createMidLatex() {
 
         case "$T" in
 
-            "fillin") SECTION='\section{Completar}';;
-            "truefalse") SECTION='\section{Verdadero / Falso}';;
-            "towrite") SECTION='\section{A desarrollar}';;
-            "multiplechoice") SECTION='\section{Multiplechoice}';;
+            "fillin")           SECTION='\section{Completar}';;
+            "truefalse")        SECTION='\section{Verdadero / Falso}';;
+            "towrite")          SECTION='\section{A desarrollar}';;
+            "multiplechoice")   SECTION='\section{Multiplechoice}';;
 
             *) SECTION=$T;;
 

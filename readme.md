@@ -56,8 +56,12 @@ The filename structure is in the format ```UU99.tex```.
 # Usage
 
 *  ```help```             Help.
-*  ```create-exam```       Create the exam in pdf format, ready to print.
-*  ```choose-questions```  Choose questions WITHOUT creating the exam.
+*  ```create-exam```      Create the exam in pdf format, ready to print.
+    *  ```-u <1,2,3,4,...>```  units.
+    *  ```-d <title>```        override Exam Title.
+    *  ```-t <db1,db2,..>```   list of db's to be used.
+    *  ```-q <n>```            number of questions by db and unit.
+*  ```choose-questions``` Choose questions WITHOUT creating the exam.
 *  ```pick```             Pick one question. Just to test the random system.
 *  ```showdb```           Show some minor statistics of the DB.
 
