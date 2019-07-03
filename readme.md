@@ -24,7 +24,7 @@ All the questions are in a frequency table in order to minimize the posibility o
 
 ## Files
 
-*  __aegs__: Main binary.
+*  __aegs__: Main script.
 *  __aegs.ini__: INI config file. It will be created if it doesn't exists. 
 *  __CQstats.db__: Statistic file. Here are all the questions and it's probability to be taken. It will be created if it doesn't exists, scanning all the questions files and calculating it's probability (that are the same when the file is created).
 
