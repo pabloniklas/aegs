@@ -320,19 +320,6 @@ function pickQ () {
     updateStats $CQ
 }
 
-# function createAuxLatex () {
-
-#     for T in ${DB_PATH[@]}; do
-
-#         NAME=`basename $T`
-#         showInfo "Creating file $NAME.tex"
-
-#         echo "%% Here comes the chosen questions of $NAME table %%" > $NAME.tex
-
-#     done
-
-# }
-
 ### createMainLatex
 function createMainLatex () {
 
@@ -690,7 +677,6 @@ function chooseQuestions() {
             # Search pool of questions giving UNIT and TABLE.
             POINTER=0; unset QUESTIONS_POOL
             for ((A=0 ; A<${#TEXFILE[@]} ; A++)); do
-                #U="`echo ${TEXFILE[$A]}|cut -d/ -f3|cut -d. -f1`"
                 U="`echo ${TEXFILE[$A]##*/}|cut -d. -f1`"
                 U=${U:0:2}  # substrin
                 T="`echo ${TEXFILE[$A]}|awk -F/ '{print $(NF-1)}'`"
