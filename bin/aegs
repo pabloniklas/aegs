@@ -320,8 +320,8 @@ function pickQ () {
     updateStats $CQ
 }
 
-### createMainLatex
-function createMainLatex () {
+### createMainLaTeX
+function createMainLaTeX () {
 
 (cat <<'LATEX1'
 
@@ -541,7 +541,7 @@ LATEX1
     sed -i "s/%%DEPARTMENT%%/$DEPARTMENT/" exam_01_$$.tex
 }
 
-function createEndLatex {
+function createEndLaTeX {
 
 (cat <<'LATEX1'
 
@@ -553,8 +553,8 @@ LATEX1
 
 }
 
-### createLatex
-function createLatex() {
+### createLaTeX
+function createLaTeX() {
 
     FILE=$1
     TMP_LOG=/tmp/$RANDOM.latex.log
@@ -747,7 +747,7 @@ function chooseQuestions() {
     showInfo "$S"
 }
 
-function createMidLatex() {
+function createMidLaTeX() {
 
     if [ ${#CHOOSEN_QUESTIONS[@]} -eq 0 ]; then
         showError "There aren't any question generated yet."
@@ -965,11 +965,11 @@ while [ ! -z "$1" ]; do
                         initStatFile       # Create the stat file if it doesn't exist.
                         chooseQuestions $TABLES $UNITS $QQ
                         saveDB
-                        createMainLatex
-                        createMidLatex
-                        createEndLatex
+                        createMainLaTeX
+                        createMidLaTeX
+                        createEndLaTeX
                         cat exam_*_$$.tex > exam_$$.tex
-                        createLatex exam_$$.tex
+                        createLaTeX exam_$$.tex
                         mv exam_$$.tex exam_`date '+%F-%R:%S'`.tex.bkp
                         rm -f exam*.tex exam*.aux exam*.log exam*.synctex.gz *.listing
                     fi
