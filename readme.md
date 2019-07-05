@@ -71,7 +71,8 @@ The filename structure is in the format ```UU99.tex```.
 *  ```help```             Help.
 *  ```create-exam```      Create the exam in pdf format, ready to print.
     *  ```-u <1,2,3,4,...>```  units.
-    *  ```-d <title>```        override Exam Title.
+    *  ```-i <title>```        override Exam Title.
+    *  ```-d <date>```         override Exam Date.
     *  ```-t <db1,db2,..>```   list of db's to be used.
     *  ```-q <n>```            number of questions by db and unit.
 *  ```choose-questions``` Choose questions WITHOUT creating the exam.

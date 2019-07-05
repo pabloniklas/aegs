@@ -867,7 +867,8 @@ USAGE:
 aegs.sh -help:             This help.
              -create-exam       Create the latex files, ready to print.
                 -u: units.
-                -d: override Exam Title.
+                -i: override Exam Title.
+                -d: override Exam Date.
                 -t: db to be used.
                 -q: number of questions by db and unit.
 
@@ -935,8 +936,12 @@ while [ ! -z "$1" ]; do
                                     done
                                     ;;
 
-                            "x-d")  shift
+                            "x-i")  shift
                                     EXAM_TYPE="$1"
+                                    ;;
+
+                            "x-d")  shift
+                                    EXAM_DATE="$1"
                                     ;;
 
                             "x-q")  shift
