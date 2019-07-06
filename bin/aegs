@@ -467,7 +467,7 @@ function createMainLaTeX () {
     \item \textbf{Usar birome a azul o negra}. No entregar el examen en lápiz.
     \item \textbf{Escribir la respuesta final} en el espacio provisto. 
     \item En las preguntas \textit{Multiplechoice}, \textbf{deben marcarse todas las respuestas correctas.}
-    \item \textbf{Completar los Nombres y Apellido/s} en todas las hojas dadas.
+    \item \textbf{Completar los Nombres y Apellido/s} en \textbf{TODAS} las hojas dadas.
     \end{itemize}
     \end{mdframed}
 
@@ -561,8 +561,10 @@ function createLaTeX() {
 
     # We have to run pdflatex twice to generate the point table.
     showInfo "Creating PDF (compiling $FILE)..."
-    pdflatex -synctex=1 -interaction=nonstopmode $FILE > $TMP_LOG 2>&1
-    pdflatex -synctex=1 -interaction=nonstopmode $FILE >> $TMP_LOG 2>&1
+#    pdflatex -synctex=1 -interaction=nonstopmode $FILE > $TMP_LOG 2>&1
+#    pdflatex -synctex=1 -interaction=nonstopmode $FILE >> $TMP_LOG 2>&1
+    xelatex -synctex=1 -interaction=nonstopmode $FILE > $TMP_LOG 2>&1
+    xelatex -synctex=1 -interaction=nonstopmode $FILE >> $TMP_LOG 2>&1
 
     if [ ! $? -eq 0 ]; then
          CMD=showWarning 
@@ -786,9 +788,21 @@ function createMidLaTeX() {
                 showInfo "   * $FILE"
                 if $SHUFFLE && [[ $T == "multiplechoice" ]]; then
                     showInfo "     (shuffled)"
-                    grep -v '\end' ${TEXFILE[$ID]} | grep -ve '[Cc]hoice' > $SHUFTMPFILE
+                    grep -v '\end' ${TEXFILE[$ID]} | grep -ve '[Cc]hoice' | grep -v checkboxes > $SHUFTMPFILE
+
+                    BEGIN="`grep begin ${TEXFILE[$ID]} | grep check`"
+                    END="`grep end ${TEXFILE[$ID]} | grep check`"
+
+                    if [ ! -z "`grep '{sexylisting}' ${TEXFILE[$ID]}`" ]; then
+                        echo '\end{sexylisting}' >> $SHUFTMPFILE
+                    fi
+
+                    echo $BEGIN >> $SHUFTMPFILE
+
                     grep -e '[Cc]hoice' ${TEXFILE[$ID]} | shuf >> $SHUFTMPFILE
-                    echo '\end{oneparcheckboxes}' >> $SHUFTMPFILE
+
+                    echo $END >> $SHUFTMPFILE
+
                     cat $SHUFTMPFILE >> exam_02_$$.tex
                     rm -f $SHUFTMPFILE
                 else
