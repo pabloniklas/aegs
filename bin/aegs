@@ -874,21 +874,23 @@ function showHelp {
 
 cat <<EOF
 ##########################################################
-                Exam generator. By PN.
+       Exam generator :: By pablo.niklas@gmail.com
 ##########################################################
 
 USAGE:
-aegs.sh -help:             This help.
-             -create-exam       Create the latex files, ready to print.
+~~~~~~
+
+aegs.sh     -help:             This help.
+            -create-exam       Create the latex files, ready to print.
                 -u: units.
                 -i: override Exam Title.
                 -d: override Exam Date.
                 -t: db to be used.
                 -q: number of questions by db and unit.
 
-             -choose-questions  Choose questions WITHOUT creating the exam.
-             -pick:             Pick one question. Just to test the random system.
-             -showdb:           Show some minor statistics of the questions DB.
+            -choose-questions  Choose questions WITHOUT creating the exam.
+            -pick:             Pick one question. Just to test the random system.
+            -showdb:           Show some minor statistics of the questions DB.
 EOF
 
     exit 0
