@@ -64,8 +64,8 @@ function generate_soup () {
 
     for ((I=0;I<$SIZE;I++)) {
         for ((J=0;J<$SIZE;J++)) {
-            #SOUP[$I,$J]=`cat /dev/urandom| tr -dc 'A-Z'|head -c 1`
-            SOUP[$I,$J]="."
+            SOUP[$I,$J]=`cat /dev/urandom| tr -dc 'A-Z'|head -c 1`
+            #SOUP[$I,$J]="."
         }
     }
 }
@@ -212,10 +212,10 @@ function put_words () {
         echo -n "WORD: $WORD - "
 
         # Reversed or not
-        # if [ $REVERSE -eq 1 ]; then 
-        #     WORD=`echo $WORD| rev`
-        #     echo -n "(rev) - "
-        # fi
+        if [ $REVERSE -eq 1 ]; then 
+            WORD=`echo $WORD| rev`
+            echo -n "(rev) - "
+        fi
 
         # Switch orientation
         case $ORIENTATION in
