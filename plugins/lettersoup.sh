@@ -10,6 +10,7 @@
 # ChangeLog: 
 #
 # 09/10/2019 - PSRN - Initial version.
+# 10/10/2019 - PSRN - Argument parsing & help.
 #
 
 #######################################################################
@@ -25,7 +26,6 @@ declare -A SOLUTION
 declare -A CHOOSEN_CELLS
 declare SIZE
 
-
 #######################################################################
 # Functions area
 #######################################################################
@@ -38,6 +38,8 @@ source $LIBPATH/cecho_lib.sh
 ##################################################################
 ### myFunctions
 ##################################################################
+
+### print_soup
 function print_soup () {
 
     for ((I=0;I<$SIZE;I++)) {
@@ -48,6 +50,7 @@ function print_soup () {
     }
 }
 
+### For DEV: dev_print_detection_matrix
 function dev_print_detection_matrix {
 
     echo "========================================"
@@ -59,6 +62,7 @@ function dev_print_detection_matrix {
     }
 }
 
+### generate_soup
 function generate_soup () {
 
     for ((I=0;I<$SIZE;I++)) {
@@ -69,6 +73,7 @@ function generate_soup () {
     }
 }
 
+### analyze_collision
 function analyze_collision () {
 
     local VCOL
@@ -147,6 +152,7 @@ function analyze_collision () {
     return
 }
 
+### put_words
 function put_words () {
 
     local WORDS
@@ -290,20 +296,23 @@ function put_words () {
     done
 }
 
+### showHelp
 function showHelp() {
 
 cat <<'EOF'
 
-        G P Q Z I Y S J R B 
-        O A V V N U K U G L 
-        C U V V X M I I L M 
-        E P V Z D O M E U Y 
-        Z Y V E H I T T V B 
-        D E E C H T P Y H B 
-        H H D K E F D A F H 
-        E K T R U W F Z R S 
-        U O D I S O U P G B 
-        F D J V F E I Z P N 
+                  /--                 --\
+                  | G P Q Z I Y S J R B |
+                  | O A V V N U K U G L |
+                  | C U V V X M I I L M |
+                  | E P V Z D O M E U Y |
+                  | Z Y V E H I T T V B |
+                  | D E E C H T P Y H B |
+                  | H H D K E F D A F H |
+                  | E K T R U W F Z R S |
+                  | U O D I S O U P G B |
+                  | F D J V F E I Z P N |
+                  \--                 --/
 
      :: Letter Soup Plugin for AEGS :: By pablo.niklas@gmail.com ::
 
@@ -314,7 +323,7 @@ aegs.sh     -help:             This help.
             -create-soup       Create the letter soup.
                 -size: size (nxn)
                 -words: list of words, separated by comma (,).
-                
+
 EOF
 
     exit 0
@@ -358,4 +367,3 @@ while [ ! -z "$1" ]; do
     shift
 done 
 
-#dev_print_detection_matrix
