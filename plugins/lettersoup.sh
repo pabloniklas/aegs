@@ -21,11 +21,10 @@
 #######################################################################
 
 declare -A SOUP
+declare -A SOLUTION
 declare -A CHOOSEN_CELLS
 declare SIZE
 
-SIZE="$1"
-WORDS="$2"
 
 #######################################################################
 # Functions area
@@ -65,7 +64,7 @@ function generate_soup () {
     for ((I=0;I<$SIZE;I++)) {
         for ((J=0;J<$SIZE;J++)) {
             SOUP[$I,$J]=`cat /dev/urandom| tr -dc 'A-Z'|head -c 1`
-            #SOUP[$I,$J]="."
+            SOLUTION[$I,$J]="."
         }
     }
 }
@@ -227,6 +226,7 @@ function put_words () {
                 for ((J=0;J<${#WORD};J++)) {
                     CCOL=$(($J+$COL))
                     SOUP[$ROW,$CCOL]=${WORD:$J:1}
+                    SOLUTION[$ROW,$CCOL]=${WORD:$J:1}
                     CHOOSEN_CELLS[$ROW,$CCOL]=1
                 }
                 ;;
@@ -239,6 +239,7 @@ function put_words () {
                 for ((J=0;J<${#WORD};J++)) {
                     CROW=$(($J+$ROW))
                     SOUP[$CROW,$COL]=${WORD:$J:1}
+                    SOLUTION[$CROW,$COL]=${WORD:$J:1}
                     CHOOSEN_CELLS[$CROW,$COL]=1
                 }   
                 ;;
@@ -259,6 +260,7 @@ function put_words () {
                     done
 
                     SOUP[$CROW,$CCOL]=${WORD:$J:1}
+                    SOLUTION[$CROW,$CCOL]=${WORD:$J:1}
                     CHOOSEN_CELLS[$CROW,$CCOL]=1
                 }   
                 ;;
@@ -279,23 +281,81 @@ function put_words () {
                     done
 
                     SOUP[$CROW,$CCOL]=${WORD:$J:1}
+                    SOLUTION[$CROW,$CCOL]=${WORD:$J:1}
                     CHOOSEN_CELLS[$CROW,$CCOL]=1
                 }   
                 ;;
 
         esac
-
-
     done
 }
 
-if [ -z "$SIZE" ] || [ -z "$WORDS" ]; then
-    showError "Must specify SIZE and WORDS."
-    exit 1
-fi
+function showHelp() {
 
-generate_soup
-#set -x
-put_words $WORDS
-print_soup  
+cat <<'EOF'
+
+        G P Q Z I Y S J R B 
+        O A V V N U K U G L 
+        C U V V X M I I L M 
+        E P V Z D O M E U Y 
+        Z Y V E H I T T V B 
+        D E E C H T P Y H B 
+        H H D K E F D A F H 
+        E K T R U W F Z R S 
+        U O D I S O U P G B 
+        F D J V F E I Z P N 
+
+     :: Letter Soup Plugin for AEGS :: By pablo.niklas@gmail.com ::
+
+USAGE:
+~~~~~~
+
+aegs.sh     -help:             This help.
+            -create-soup       Create the letter soup.
+                -size: size (nxn)
+                -words: list of words, separated by comma (,).
+                
+EOF
+
+    exit 0
+
+
+}
+
+#######################################################
+# ENTRY POINT
+#######################################################
+
+[ $# -eq 0 ] && showHelp && exit 1
+
+# ARG processing
+while [ ! -z "$1" ]; do
+    case "x$1" in 
+        "x-create-soup")   shift
+                        while [ ! -z "$1" ]; do
+                            case "x$1" in 
+                                "x-size")
+                                            shift
+                                            SIZE=$1
+                                            ;;
+
+                                "x-words")
+                                            shift
+                                            WORDS="$1"
+                                            ;;
+                            esac
+                            shift
+                        done
+                        generate_soup
+                        put_words $WORDS
+                        print_soup 
+                        ;;
+
+        "x-help")       showHelp ;;
+
+        *)              showHelp ;;
+    esac
+    shift
+done 
+
 #dev_print_detection_matrix
