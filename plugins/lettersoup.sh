@@ -7,8 +7,10 @@
 #
 #######################################################################
 #
-# Requirement
+# Requirements:
 #
+# The soup package provided by texlive-games is outdated.
+# You have to download an updated copy from gitlab:
 # https://gitlab.com/simers/soup.git
 #
 #
@@ -35,7 +37,7 @@ declare -a COORDS
 # Functions area
 #######################################################################
 
-LIBPATH=../`dirname $0`/lib
+LIBPATH=`dirname $0`/../lib
 
 source $LIBPATH/cecho_lib.sh
 
@@ -80,7 +82,7 @@ function soup2latex() {
     local A
     local TEX_OUTPUT
 
-    TEX_OUTPUT="soup.tex"
+    TEX_OUTPUT="$1"
 
     echo "" > $TEX_OUTPUT
     echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" >> $TEX_OUTPUT
@@ -390,7 +392,7 @@ function put_words () {
 }
 
 ### showHelp
-function showHelp() {
+function logo() {
 
 cat <<'EOF'
 
@@ -409,19 +411,30 @@ cat <<'EOF'
 
      :: Letter Soup Plugin for AEGS :: By pablo.niklas@gmail.com ::
 
+EOF
+
+}
+
+function showHelp() {
+
+logo
+
+cat <<'EOF'
+
 USAGE:
 ~~~~~~
 
 lettersoup.sh  -help:           This help.
                -create-soup:    Create the letter soup.
-                   -size:             Size (nxn).
-                   -words:            List of words, separated by comma (,).
-                  [-file <filename>]: Write the solution to a given file.
-                  [-print-soup]:      Print the generated soup.
+                   -size:                  Size (nxn).
+                   -words:                 List of words, separated by comma (,).
+                  [-to-latex <filename>]:  Output in latex format.
+                  [-file <filename>]:      Write the solution to a given file.
+                  [-print-soup]:           Print the generated soup.
 
 EOF
 
-    exit 0
+    exit 1
 }
 
 #######################################################
@@ -431,7 +444,7 @@ EOF
 [ $# -eq 0 ] && showHelp && exit 1
 
 # ARG processing
-FLAG_PS=0; FLAG_PT=0; FLAG_LA=0
+FLAG_PS=0; FLAG_PT=0
 while [ ! -z "$1" ]; do
     case "x$1" in 
         "x-create-soup")   shift
@@ -457,19 +470,26 @@ while [ ! -z "$1" ]; do
                                             ;;
 
                                 "x-print-solution")
-                                                    FLAG_PT=1
+                                            FLAG_PT=1
                                                     ;;
 
-                                "x-to-latex")   FLAG_LA=1
+                                "x-to-latex")   
+                                                shift
+                                                if [ -z "$1" ]; then
+                                                    showError "Missing filename."
+                                                    exit 2
+                                                fi
+                                                TEX_OUTPUT="$1"
                                                 ;;
                             esac
                             shift
                         done
+                        logo
                         generate_soup
                         put_words $WORDS
                         [ $FLAG_PS -eq 1 ] && print_soup 
                         [ $FLAG_PT -eq 1 ] && print_solution
-                        [ $FLAG_LA -eq 1 ] && soup2latex
+                        [ ! -z "$TEX_OUTPUT" ] && soup2latex $TEX_OUTPUT
                         [ ! -z "$FILENAME" ] && coords2file "$FILENAME"
                         ;;
 
@@ -481,4 +501,3 @@ while [ ! -z "$1" ]; do
 done 
 
 exit 0
-

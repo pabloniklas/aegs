@@ -20,7 +20,8 @@
 # 30/06/2019 - PSRN - Overrides Exam Title. 
 # 03/07/2019 - PSRN - Shuffle the options in multiplechoice questions.
 # 15/07/2019 - PSRN - Filter by points.
-# 10/10/2019 + PSRN - Plugin support added.
+# 10/10/2019 - PSRN - Plugin support added.
+# 11/10/2019 - PSRN - FULL plugin support.
 #
 
 #######################################################################
@@ -31,7 +32,7 @@
 
 shopt -s extglob
 
-# Variables
+# Global Arrays
 declare -a LABEL
 declare -a TEXFILE
 declare -a QCREM
@@ -42,6 +43,8 @@ declare -a LI
 
 declare -a DBTABLES
 declare -a CHOOSEN_QUESTIONS
+
+declare -a PLUGINS
 
 #######################################################################
 # Functions area
@@ -297,6 +300,7 @@ function createMainLaTeX () {
     \usepackage[spanish]{babel}
     
     \usepackage{mdframed}
+    \usepackage{soup}
 
     \usepackage{lmodern}
     \usepackage{inconsolata}
@@ -470,8 +474,11 @@ LATEX1
     [ -z "$EXAM_TYPE" ] && showWarning "Exam Type is blank."
     [ -z "$LOGO_PATH" ] && showWarning "Logo Path is blank."
     [ -z "$UNIVERSITY" ] && showWarning "University is blank."
-    [ ! -f $LOGO_PATH ] && showError "The logo file $LOGO_FILE doesn't exist."
-    LOGO_PATH="`echo $LOGO_PATH|sed 's/\./\\\./g;s/\//\\\\\//g'`"
+    if [ ! -f $LOGO_PATH ]; then 
+        showError "The logo file $LOGO_PATH doesn't exist."
+    else
+        LOGO_PATH="`echo $LOGO_PATH|sed 's/\./\\\./g;s/\//\\\\\//g'`"
+    fi
     sed -i "s/%%EXAM_TYPE%%/$EXAM_TYPE/;s/%%LOGO_PATH%%/$LOGO_PATH/;s/%%UNIVERSITY%%/$UNIVERSITY/" exam_01_$$.tex
     [ -z "$DEPARTMENT" ] && showWarning "Department is blank."
     sed -i "s/%%DEPARTMENT%%/$DEPARTMENT/" exam_01_$$.tex
@@ -492,6 +499,9 @@ LATEX1
 ### createLaTeX
 function createLaTeX() {
 
+    local FILE
+    local TMP_LOG
+
     FILE=$1
     TMP_LOG=/tmp/$RANDOM.latex.log
 
@@ -501,17 +511,14 @@ function createLaTeX() {
     xelatex -synctex=1 -interaction=nonstopmode $FILE >> $TMP_LOG 2>&1
 
     if [ ! $? -eq 0 ]; then
-         CMD=showWarning 
+         showWarning "Process not OK. See logs: $TMP_LOG."
     else   
-         CMD=showOK
+         showOK "PDF created without warnings nor errors."
     fi
 
-    while IFS= read -r LINE ; do
-        $CMD $LINE
-    done < $TMP_LOG
-
-    showInfo "Done."
-
+    # while IFS= read -r LINE ; do
+    #     $CMD $LINE
+    # done < $TMP_LOG
 }
 
 ### calculateFrecuencies
@@ -656,13 +663,9 @@ function chooseQuestions() {
                     else
                         showWarning "Question already choosen. Repeating."
                     fi
-
                 done
-                
             fi
-
         done
-
     done
 
     calculateFrecuencies
@@ -738,7 +741,47 @@ function createMidLaTeX() {
     showOK "Done."
 }
 
-# TODO: Plugins latex
+function pluginslatex () {
+
+    local LOGTMP
+    local PLUGIN_NAME
+    local PLUGIN_TMP_FILE
+    
+    PLUGIN_TMP_FILE=/tmp/$$.tex
+
+    showInfo "Adding plugins output:"
+
+    LOGTMP="/tmp/plugin$$.log"
+
+    for((L=0;L<${#PLUGINS[@]};L++)) {
+        PLUGIN_NAME="`echo ${PLUGINS[$L]}|cut -d' ' -f1`"
+        PLUGIN_ARGS="`echo ${PLUGINS[$L]}|cut -d' ' -f2-`"
+        PLUGIN_NAME="${PLUGIN_NAME}.sh"
+        showInfo "    $PLUGIN_NAME"
+
+        rm -f $LOGTMP $PLUGIN_TMP_FILE
+
+        showInfo "    CMD: `dirname $0`/../plugins/$PLUGIN_NAME $PLUGIN_ARGS -to-latex $PLUGIN_TMP_FILE"
+        `dirname $0`/../plugins/$PLUGIN_NAME $PLUGIN_ARGS -to-latex $PLUGIN_TMP_FILE >> $LOGTMP 2>&1
+        RC=$?
+
+        if [ $RC -eq 0 ] && [ -f $PLUGIN_TMP_FILE ]; then
+            showOK "Plugins execution OK. Output incorporated to main LaTeX file."
+            cat $PLUGIN_TMP_FILE >> exam_02_$$.tex
+        else
+            showError "Plugin's output file, NOT generated."
+        fi
+        
+        while IFS= read -r LINE; do
+            [ $RC -eq 0 ] && showOK "$PLUGIN_NAME: $LINE"
+            [ $RC -gt 0 ] && showError "$PLUGIN_NAME: $LINE"
+        done < $LOGTMP
+    }
+
+    rm -f $LOGTMP
+
+    showOK "Done."
+}
 
 ### createINIfile
 function checkINIfile {
@@ -793,10 +836,11 @@ function checkDIRs {
     done
 }
 
-### showHelp
-function showHelp {
+### logo
+function logo () {
 
 cat <<'EOF'
+
             ___           ___           ___           ___
            /\  \         /\  \         /\  \         /\  \
           /::\  \       /::\  \       /::\  \       /::\  \
@@ -811,6 +855,18 @@ cat <<'EOF'
     
      :: An Exam Generator System :: By pablo.niklas@gmail.com ::
 
+EOF
+
+
+}
+
+
+### showHelp
+function showHelp {
+
+logo
+
+cat <<'EOF'
 USAGE:
 ~~~~~~
 
@@ -842,13 +898,15 @@ function listplugins() {
     local PDESCRIPTION
     local PLCOUNT
 
-    echo "Plugins List"
+    echo "Plugins List:"
+    echo "~~~~~~~~~~~~~"
+    
     TMPFILE=/tmp/$$.plugin
     PLUGINDIR=`dirname $0`/../plugins
 
-    PLCOUNT=`ls $PLUGINDIR|wc -l`
+    PLCOUNT=`ls $PLUGINDIR/*.sh|wc -l`
 
-    for P in $(ls $PLUGINDIR); do
+    for P in $(ls $PLUGINDIR|grep .sh); do
         PNAME=`grep '# NAME' $PLUGINDIR/$P|cut -d: -f2`
         PAUTHOR=`grep '# AUTHOR' $PLUGINDIR/$P|cut -d: -f2`
         PDESCRIPTION=`grep '# DESCRIPTION' $PLUGINDIR/$P|cut -d: -f2`
@@ -865,23 +923,20 @@ function listplugins() {
         printf("-------------------------------------------------");
         printf("-------------------------------------------------");
         printf("----------------\n")
-        }
-        {
+    }
+    {
         printf("|%-20s|%-40s|%-50s|\n", $1, $2, $3);
-        }
-        END{
+    }
+    END{
         printf("-------------------------------------------------");
         printf("-------------------------------------------------");
         printf("----------------\n")
-        }' $TMPFILE
+    }' $TMPFILE
 
     echo
     echo "Total: $PLCOUNT."
 
-
-
     rm -f $TMPFILE
-
 }
 
 # TODO: Autodetect update.
@@ -902,12 +957,17 @@ checkDIRs
 [ $# -eq 0 ] && showHelp && exit 1
 
 for (( I=0; I <${#DB_PATH[@]} ; I++)); do
-    DBTABLES[$I]="`echo ${DB_PATH[$I]}|cut -d/ -f2`"
+    DBTABLES+=("`echo ${DB_PATH[$I]}|cut -d/ -f2`")
 done
 
 # ARG processing
 while [ ! -z "$1" ]; do
     case "x$1" in 
+        "x-plugin") shift
+                    [[ "$1" =~ (^[a-z]*[A-Z]*) ]] && PLUGIN_NAME=${BASH_REMATCH[1]}
+                    [[ "$1" =~ :(.*) ]] && OPTS=${BASH_REMATCH[1]}
+                    PLUGINS+=("$PLUGIN_NAME $OPTS")
+                    ;;
 
         "x-list-plugins")
                     listplugins
@@ -996,17 +1056,7 @@ while [ ! -z "$1" ]; do
                     if [ $FLAG ]; then
                         showHelp
                     else
-                        showHeader
-                        initStatFile       # Create the stat file if it doesn't exist.
-                        chooseQuestions $TABLES $UNITS $QQ
-                        saveDB
-                        createMainLaTeX
-                        createMidLaTeX
-                        createEndLaTeX
-                        cat exam_*_$$.tex > exam_$$.tex
-                        createLaTeX exam_$$.tex
-                        mv exam_$$.tex exam_`date '+%F-%R:%S'`.tex.bkp
-                        rm -f exam*.tex exam*.aux exam*.log exam*.synctex.gz *.listing
+                        CREATE_EXAMEN=true
                     fi
                     ;;                    
 
@@ -1055,11 +1105,7 @@ while [ ! -z "$1" ]; do
                     if [ $FLAG ]; then
                         showHelp
                     else
-                        showHeader
-                        initStatFile       # Create the stat file if it doesn't exist.
-                        chooseQuestions $TABLES $UNITS $QQ
-                        saveDB
-                        showInfo "# Generated questions: ${#CHOOSEN_QUESTIONS[@]} "
+                        CHOOSE_QUESTIONS="true"
                     fi
                     ;;                    
 
@@ -1070,5 +1116,33 @@ while [ ! -z "$1" ]; do
 
     shift
 done 
+
+if [ "$CHOOSE_QUESTIONS" == "true" ] && [ "$CREATE_EXAMEN" == "true" ]; then
+    showError "-choose-questions and -create-exam and mutually exclusive. In fact, -choose-questions is used by -create-exam."
+    exit 2
+fi 
+
+if [ "$CHOOSE_QUESTIONS" == "true" ]; then
+    showHeader
+    initStatFile       # Create the stat file if it doesn't exist.
+    chooseQuestions $TABLES $UNITS $QQ
+    saveDB
+    showInfo "# Generated questions: ${#CHOOSEN_QUESTIONS[@]} "
+fi
+
+if [ ! -z "$CREATE_EXAMEN" ]; then
+    showHeader
+    initStatFile       # Create the stat file if it doesn't exist.
+    chooseQuestions $TABLES $UNITS $QQ
+    saveDB
+    createMainLaTeX
+    createMidLaTeX
+    [ ${#PLUGINS[@]} -gt 0 ] && pluginslatex
+    createEndLaTeX
+    cat exam_*_$$.tex > exam_$$.tex
+    createLaTeX exam_$$.tex
+    mv exam_$$.tex exam_`date '+%F-%R:%S'`.tex.bkp
+    rm -f exam*.tex exam*.aux exam*.log exam*.synctex.gz *.listing
+fi
 
 exit 0
