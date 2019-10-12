@@ -147,17 +147,7 @@ aegs -pick
 
 # Plugins
 
-AEGS now supports plugin architecture to enhance it functionality
-
-## lettersoup.sh
-
-This plugin creates a lettersoup for the exam.
-
-### Usage (alone)
-
-```
-aegs -plugin lettersoup:"-create-soup -size 10 -words HOLA,MUNDO" -create-exam -t truefalse -u 1 -q 1 -i "Test" -d "`date`"
-```
+AEGS now supports plugin architecture to enhance it functionality. See the readme in the plugins directory for further details.
 
 # License
 
