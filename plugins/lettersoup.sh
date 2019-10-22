@@ -25,7 +25,7 @@
 # NAME: Letter Soup
 # DESCRIPTION: Create a letter soup, giving a set of words.
 # AUTHOR: Pablo Niklas <pablo.niklas@gmail.com>
-# VERSION: 0.1
+# VERSION: 1.0
 #######################################################################
 
 declare -A SOUP
