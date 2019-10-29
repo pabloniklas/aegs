@@ -122,18 +122,19 @@ def find_longest_and_shortest_word(list_of_words):
 
 def create_matrix(n):
 
-    m = n
+    m = n   # squared
 
     show_info(f'Creating matrix {n}x{m}')
+    
+    Matrix = [[0 for x in range(m)] for y in range(n)]
 
-    val = []
-
-    for x in range(n):
-        val.append('.' * m)
+    for x in range(m):
+        for y in range(n):
+            Matrix[x][y]="."
 
     show_ok('Done')
 
-    return val
+    return Matrix
 
 
 def print_matrix(matrix):
@@ -163,6 +164,7 @@ def letter_frecuency(test_str):
 
 def create_crossword(matrix, words):
     import random
+    from collections import Counter
 
     # The first (and longest) word
     longest, shortest = find_longest_and_shortest_word(words.keys())
@@ -175,30 +177,66 @@ def create_crossword(matrix, words):
                   "(): Word size is bigger than the matrix.")
         return (False)
 
-    orientation = random.randint(0, 1)
+    #orientation = random.randint(0, 1)
+    orientation = 0
+    longest_orientation=orientation
 
     if (orientation == 0):
         show_info("Orientation: Horizontal.")
         y = int((size-len(longest))/2)
         x = int(((size-1)/2))
-        matrix[x] = longest.center(size, '.')
+        for m in range(0,len(matrix[0])):
+            matrix[x][m] = longest.center(size, '.')[m:m+1]
     else:
         show_info("Orientation: Vertical.")
         y = int((size-1)/2)
         x = int((size-len(longest))/2)
 
         for i in range(x, x+len(longest)):
-            matrix[i] = longest[(i-x):(i-x+1)].center(size, '.')
+            for m in range(0,len(matrix[0])):
+                matrix[i][m] = longest[(i-x):(i-x+1)].center(size, '.')[m:m+1]
 
     print_matrix(matrix)
 
-# TODO: The rest ot the words.
+    # TODO: The rest ot the words.
+    choosen_randoms=[]
     for w in words:
         w = w.upper()
         if (w != longest):
-            show_info(f"Procesando {w}")
+            show_info(f"{w}: Processing...")
+
+            # Do we have anything in common?
+            # https://stackoverflow.com/questions/44269409/count-common-characters-in-strings-python
+            s2 = w
+            s1 = longest
+
+            common_letters = Counter(s1) & Counter(s2)
+            letters = sorted(common_letters.elements())
+            if (sum(common_letters.values())) == 0:
+                show_info(f"{w}: No letters in common.")
+            else:
+                show_info(f"{w}: Letters in common: {letters}")
+                orientation = 0 if (longest_orientation==0) else 1
+                letter=letters.pop(0)   # La primera opcion
+
+                # Position of letter
+                posW = s2.find(letter)
+                posL = s1.find(letter)
+
+                # Horizontal, then vertical
+                if (orientation == 0):
+                    Xi = x-posL
+                    Yi = y
+                    for n in range(Xi,Xi+len(s2)):
+                        c = n-Xi
+                        h = x-posW+c
+                        print(h,Yi)
+                        matrix[h][Yi]=s2[c:c+1]
+
+            print_matrix(matrix)
+
         else:
-            show_info(f"No se procesa {w}")
+            show_info(f"{w}: It won't be processed. It's the longest word.")
 
 
 # MAIN
