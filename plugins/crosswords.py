@@ -230,8 +230,10 @@ def create_crossword(matrix, words):
                     for n in range(Xi,Xi+len(s2)):
                         c = n-Xi
                         h = x-posW+c
-                        print(h,Yi)
-                        matrix[h][Yi]=s2[c:c+1]
+                        if next((x for x in choosen_randoms if x=={h,Yi}), [0])==0:
+                            matrix[h][Yi]=s2[c:c+1]
+                            choosen_randoms.append({h,Yi})
+                            show_info("Coors accepted: ("+str(h)+","+str(Yi)+")")
 
             print_matrix(matrix)
 
