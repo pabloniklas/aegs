@@ -166,6 +166,9 @@ def create_crossword(matrix, words):
     import random
     from collections import Counter
 
+
+    choosen_randoms = []
+
     # The first (and longest) word
     longest, shortest = find_longest_and_shortest_word(words.keys())
     size = len(matrix)
@@ -186,7 +189,10 @@ def create_crossword(matrix, words):
         y = int((size-len(longest))/2)
         x = int(((size-1)/2))
         for m in range(0,len(matrix[0])):
-            matrix[x][m] = longest.center(size, '.')[m:m+1]
+            aux = longest.center(size, '.')[m:m+1]
+            matrix[x][m] = aux
+            if aux != '.':
+                choosen_randoms.append((x,m))
     else:
         show_info("Orientation: Vertical.")
         y = int((size-1)/2)
@@ -194,12 +200,15 @@ def create_crossword(matrix, words):
 
         for i in range(x, x+len(longest)):
             for m in range(0,len(matrix[0])):
-                matrix[i][m] = longest[(i-x):(i-x+1)].center(size, '.')[m:m+1]
+                aux = longest[(i-x):(i-x+1)].center(size, '.')[m:m+1]
+                matrix[i][m] = aux
+                if aux != '.':
+                    choosen_randoms.append((i,m))
 
     print_matrix(matrix)
+    print(choosen_randoms)
 
     # TODO: The rest ot the words.
-    choosen_randoms=[]
     for w in words:
         w = w.upper()
         if (w != longest):
@@ -230,11 +239,13 @@ def create_crossword(matrix, words):
                     for n in range(Xi,Xi+len(s2)):
                         c = n-Xi
                         h = x-posW+c
-                        if next((x for x in choosen_randoms if x=={h,Yi}), [0])==0:
+                        if next((x for x,y in choosen_randoms if x==h), 0)==0:
                             matrix[h][Yi]=s2[c:c+1]
-                            choosen_randoms.append({h,Yi})
-                            show_info("Coors accepted: ("+str(h)+","+str(Yi)+")")
-
+                            choosen_randoms.append((h,Yi))
+                            show_info(f"Coors accepted: ({h},{Yi})")
+                        else:
+                            show_info(f"Coors rejected: ({h},{Yi})")
+                            
             print_matrix(matrix)
 
         else:
