@@ -1,5 +1,6 @@
 # Plugins directory
 
+
 ## Lettersoup
 
                        /--                 --\
@@ -38,3 +39,25 @@ lettersoup.sh  -help:           This help.
 ```
 ./lettersoup.sh -create-soup -size 15 -words WORD1,WORD2,WORD3,...WORDN -print-soup -print-solution
 ```
+
+## Crossword
+
+                        +---+
+                        | W |
+                        +---+
+                        | O |
+                    +---+---+---+---+---+
+                    | C | R | O | S | S |
+                    +---+---+---+---+---+
+                        | D |
+                        +---+
+
+    :: CrossWord Plugin :: By Pablo Niklas <pablo.niklas@gmail.com>
+
+### Important
+This plugin is not a fully functional working version.... yet :o)
+
+### Introduction
+
+This plugin creates a basic crossword using the largest word as the word to be "crossed" and the rest crossing it. It has meant to be used for the AEGS.
+
