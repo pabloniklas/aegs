@@ -17,6 +17,7 @@
 # ~~~~~~~~~
 #
 # 14/10/2019 - PSRN - Initial version.
+# 31/10/2019 - PSRN - First working version.
 #
 #######################################################################
 # PLUGIN DETAILS
@@ -180,10 +181,10 @@ def create_crossword(matrix, words):
                   "(): Word size is bigger than the matrix.")
         return (False)
 
-    #orientation = random.randint(0, 1)
-    orientation = 0
+    orientation = random.randint(0, 1)
     longest_orientation=orientation
 
+    # Longest word first
     if (orientation == 0):
         show_info("Orientation: Horizontal.")
         y = int((size-len(longest))/2)
@@ -193,6 +194,7 @@ def create_crossword(matrix, words):
             matrix[x][m] = aux
             if aux != '.':
                 choosen_randoms.append((x,m))
+                
     else:
         show_info("Orientation: Vertical.")
         y = int((size-1)/2)
@@ -205,10 +207,7 @@ def create_crossword(matrix, words):
                 if aux != '.':
                     choosen_randoms.append((i,m))
 
-    print_matrix(matrix)
-    print(choosen_randoms)
-
-    # TODO: The rest ot the words.
+    # The rest of the words
     for w in words:
         w = w.upper()
         if (w != longest):
@@ -222,42 +221,59 @@ def create_crossword(matrix, words):
             common_letters = Counter(s1) & Counter(s2)
             letters = sorted(common_letters.elements())
             if (sum(common_letters.values())) == 0:
-                show_info(f"{w}: No letters in common.")
+                show_warning(f"{w}: No letters in common.")
             else:
                 show_info(f"{w}: Letters in common: {letters}")
                 orientation = 0 if (longest_orientation==0) else 1
-                letter=letters.pop(0)   # La primera opcion
-                show_info(f"Font intersection: {letter}")
+                letter=letters.pop(random.randint(0,len(letters)-1)) 
+                show_info(f"{w}: Choosen intersection: {letter}")
 
                 # Position of letter
-                show_info(f"Searching {letter} in {s1}")
+                show_info(f"{w}: Searching {letter} in {s1}")
                 posL = s1.find(letter)
-                if posL<0: show_error("Letter not found.")
+                if posL<0: show_error(f"{w}: Letter not found.")
                 show_info(f"Searching {letter} in {s2}")
                 posW = s2.find(letter)
-                if posW<0: show_error("Letter not found.")
+                if posW<0: show_error(f"{w}: Letter not found.")
 
                 # Horizontal, then vertical
                 if (orientation == 0):
-                    show_info("Orientation (|)")
+                    show_info(f"{w}: Orientation (|)")
                     Xi = x-posW
                     Yi = y+posL
-                    show_info(f"Choosen column: {posL}")
+                    show_info(f"{w}: Choosen column: {posL}")
                     for n in range(Xi,Xi+len(s2)):
                         c = n-Xi
-                        h = x-posW+c
-                        if next((x for x,y in choosen_randoms if x==h and y==Yi), 0)==0:
-                            matrix[h][Yi]=s2[c:c+1]
-                            choosen_randoms.append((h,Yi))
-                            show_ok(f"Coors accepted: ({h},{Yi})")
+                        p = x-posW+c
+                        if next((x for x,y in choosen_randoms if x==p and y==Yi), 0)==0:
+                            matrix[p][Yi]=s2[c:c+1]
+                            choosen_randoms.append((p,Yi))
+                            show_ok(f"{w}: Coors accepted: ({p},{Yi})")
                         else:
-                            show_warning(f"Coors rejected: ({h},{Yi})")
+                            show_warning(f"{w}: Coors rejected: ({p},{Yi})")
+                else:
+                    show_info(f"{w}: Orientation (-)")
+                    Xi = x+posL-1
+                    Yi = y-posW
+#                    show_info(f"Initial coors: Xi={Xi} (x={x}, posW={posW}), Yi={Yi} (y={y}, posL={posL})")
+                    show_info(f"{w}: Choosen row: {posW}")
+                    X = Xi+1
+                    for n in range(Yi,Yi+len(s2)):
+                        Y = n
+                        if next((x for x,y in choosen_randoms if x==X and y==Y), 0)==0:
+                            c=n-Yi
+                            matrix[X][Y]=s2[c:c+1]
+                            choosen_randoms.append((X,Y))
+                            show_ok(f"{w}: Coors accepted: ({X},{Y})")
+                        else:
+                            show_warning(f"{w}: Coors rejected: ({X},{Y})")
+                    
                             
-            print_matrix(matrix)
 
         else:
             show_info(f"{w}: It won't be processed. It's the longest word.")
 
+    print_matrix(matrix)
 
 # MAIN
 
