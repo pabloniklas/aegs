@@ -216,8 +216,8 @@ def create_crossword(matrix, words):
 
             # Do we have anything in common?
             # https://stackoverflow.com/questions/44269409/count-common-characters-in-strings-python
-            s2 = w
             s1 = longest
+            s2 = w
 
             common_letters = Counter(s1) & Counter(s2)
             letters = sorted(common_letters.elements())
@@ -227,24 +227,31 @@ def create_crossword(matrix, words):
                 show_info(f"{w}: Letters in common: {letters}")
                 orientation = 0 if (longest_orientation==0) else 1
                 letter=letters.pop(0)   # La primera opcion
+                show_info(f"Font intersection: {letter}")
 
                 # Position of letter
-                posW = s2.find(letter)
+                show_info(f"Searching {letter} in {s1}")
                 posL = s1.find(letter)
+                if posL<0: show_error("Letter not found.")
+                show_info(f"Searching {letter} in {s2}")
+                posW = s2.find(letter)
+                if posW<0: show_error("Letter not found.")
 
                 # Horizontal, then vertical
                 if (orientation == 0):
-                    Xi = x-posL
-                    Yi = y
+                    show_info("Orientation (|)")
+                    Xi = x-posW
+                    Yi = y+posL
+                    show_info(f"Choosen column: {posL}")
                     for n in range(Xi,Xi+len(s2)):
                         c = n-Xi
                         h = x-posW+c
-                        if next((x for x,y in choosen_randoms if x==h), 0)==0:
+                        if next((x for x,y in choosen_randoms if x==h and y==Yi), 0)==0:
                             matrix[h][Yi]=s2[c:c+1]
                             choosen_randoms.append((h,Yi))
-                            show_info(f"Coors accepted: ({h},{Yi})")
+                            show_ok(f"Coors accepted: ({h},{Yi})")
                         else:
-                            show_info(f"Coors rejected: ({h},{Yi})")
+                            show_warning(f"Coors rejected: ({h},{Yi})")
                             
             print_matrix(matrix)
 
