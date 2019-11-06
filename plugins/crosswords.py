@@ -18,13 +18,14 @@
 #
 # 14/10/2019 - PSRN - Initial version.
 # 31/10/2019 - PSRN - First working version.
+# 01/11/2019 - PSRN - Args support.
 #
 #######################################################################
 # PLUGIN DETAILS
 # NAME: Cross Word
 # DESCRIPTION: Create a CrossWord, giving a set of words and definitions.
 # AUTHOR: Pablo Niklas <pablo.niklas@gmail.com>
-# VERSION: 0.1
+# VERSION: 0.5
 #######################################################################
 
 import sys
@@ -118,9 +119,7 @@ def find_longest_and_shortest_word(list_of_words):
 
     return longest_word, shortest_word
 
-# create matrix
-
-
+# create matrix()
 def create_matrix(n):
 
     m = n   # squared
@@ -148,7 +147,7 @@ def print_matrix(matrix):
     print("8<-----8<------8<------8<------8<------8<------8<------8<------8<------8<------")
 
 
-# letter_frecuency
+# letter_frecuency()
 def letter_frecuency(test_str):
 
     all_freq = {}
@@ -162,7 +161,44 @@ def letter_frecuency(test_str):
     # printing result
     show_info("Count of all characters in "+test_str+" is: " + str(all_freq))
 
+def latex_headers():
+    return ("\\usepackage[unboxed]{cwpuzzle}")
 
+def latex_body():
+
+    body=[]
+    
+    body.append("\\begin{Puzzle}{16}{12}")
+    #         |{}   |[1]O |[2]P |E  |R     |A  |T     |I  |O    |N  |{}    |{}   |[3]B |{} |{} |{} |.
+    #         |{}   |{}   |L    |{} |{}    |{} |{}    |{} |{}   |{} |{}    |[4]R |A    |N  |G  |E  |.
+    #         |[5]E |{}   |A    |{} |[6]M  |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
+    #         |S    |{}   |[7]C |O  |O     |R  |D     |I  |N    |A  |T     |E    |G    |R  |I  |D  |.
+    #         |T    |{}   |E    |{} |D     |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
+    #         |I    |{}   |V    |{} |E     |{} |{}    |{} |[8]V |A  |R     |I    |A    |B  |L  |E  |.
+    #         |[9]M |E    |A    |N  |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |P    |{} |{} |{} |.
+    #         |A    |{}   |L    |{} |[10]L |I  |N     |E  |G    |R  |[11]A |P    |H    |{} |{} |{} |.
+    #         |T    |{}   |U    |{} |{}    |{} |{}    |{} |{}   |{} |X     |{}   |{}   |{} |{} |{} |.
+    #         |I    |{}   |E    |{} |{}    |{} |[12]S |C  |A    |L  |E     |M    |O    |D  |E  |L  |.
+    #         |O    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |S     |{}   |{}   |{} |{} |{} |.
+    #         |N    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |{}   |{} |{} |{} |.
+    body.append("\\end{Puzzle}")
+        
+    body.append("\\begin{PuzzleClues}{\textbf{Across}}")
+    #         \Clue{1}{OPERATION}{Any mathematical process}
+    #         \Clue{4}{RANGE}{The lowest value in a set of numbers through the highest value in the set}
+    #         \Clue{7}{COORDINATEGRID}{A network of lines used for locating points}
+    #         \Clue{8}{VARIABLE}{Any symbol that could represent a number}
+    #         \Clue{9}{MEAN}{Average}
+    #         \Clue{10}{LINEGRAPH}{Graph that displays data using line segments}
+    #         \Clue{12}{SCALEMODEL}{A model or drawing based on a ratio}
+    body.append("\\end{PuzzleClues}")
+
+    return ""
+
+def latex_footer():
+    return ""
+
+### create_crossword()
 def create_crossword(matrix, words):
     import random
     from collections import Counter
@@ -274,10 +310,43 @@ def create_crossword(matrix, words):
             show_info(f"{w}: It won't be processed. It's the longest word.")
 
     print_matrix(matrix)
+    
+def appendFile(file, texto):
+    try:
+        open(file, "a+b").write(bytes(texto + "\r\n", "utf-8"))
+    except (OSError, IOError):
+        show_error("appendFile(): Hubo un error.")
 
 # MAIN
+import argparse
 
-logo()
-load_file("crossword.txt", words)
-m = create_matrix(20)
-create_crossword(m, words)
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(prog="crossword.py", description="CrossWord plugin for AEGS. - By Pablo Niklas <pablo.niklas@gmail.com>")
+    
+    parser.add_argument('-f', '--file', help='File to load the definitions from.', required='--create' in sys.argv)
+    parser.add_argument('-c', '--create', help="Create crossword.", action='store_true', default=False)
+
+    args = parser.parse_args()
+    
+    if args is not None:
+    
+        archivo = args.file
+
+        if os.path.isfile(archivo):
+            logo()
+            show_ok(f"File {args.file} found.")
+            load_file(args.file, words)
+        else:
+            show_error(f"File {args.file} not found.")
+            sys.exit(1)
+
+        sys.exit(0)
+    else:
+        show_error("Missing arguments.")
+    
+
+# logo()
+# load_file("crossword.txt", words)
+# m = create_matrix(20)
+# create_crossword(m, words)
