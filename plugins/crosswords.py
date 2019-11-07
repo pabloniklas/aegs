@@ -139,12 +139,12 @@ def create_matrix(n):
 
 def print_matrix(matrix):
 
-    print("8<-----8<------8<------8<------8<------8<------8<------8<------8<------8<------")
+    #print("8<-----8<------8<------8<------8<------8<------8<------8<------8<------8<------")
 
     for x in matrix:
-        print(' '.join([str(elem) for elem in x]))
+        show_ok(' '.join([str(elem) for elem in x]))
 
-    print("8<-----8<------8<------8<------8<------8<------8<------8<------8<------8<------")
+    #print("8<-----8<------8<------8<------8<------8<------8<------8<------8<------8<------")
 
 
 # letter_frecuency()
@@ -328,9 +328,9 @@ if __name__ == "__main__":
     parser.add_argument('-c', '--create', help="Create crossword.", action='store_true', default=False)
 
     args = parser.parse_args()
-    
-    if args.create:
-    
+
+    # Create    
+    if args.create:    
         if args.file:
     
             archivo = args.file
@@ -339,6 +339,8 @@ if __name__ == "__main__":
                 logo()
                 show_ok(f"File {args.file} found.")
                 load_file(args.file, words)
+                m = create_matrix(20)
+                create_crossword(m, words)
             else:
                 show_error(f"File {args.file} not found.")
                 sys.exit(1)
@@ -349,8 +351,3 @@ if __name__ == "__main__":
     else:
         parser.print_help()
     
-
-# logo()
-# load_file("crossword.txt", words)
-# m = create_matrix(20)
-# create_crossword(m, words)
