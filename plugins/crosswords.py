@@ -94,7 +94,7 @@ def load_file(file, words):
     show_info("Loading definitions from '" + file + "'.")
 
     with open(file) as csvfile:
-        readCSV = csv.reader(csvfile, delimiter=';')
+        readCSV = csv.reader(csvfile, delimiter=':')
         for row in readCSV:
             definition = row[1]
             keyword = row[0]
@@ -329,21 +329,25 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     
-    if args is not None:
+    if args.create:
     
-        archivo = args.file
+        if args.file:
+    
+            archivo = args.file
 
-        if os.path.isfile(archivo):
-            logo()
-            show_ok(f"File {args.file} found.")
-            load_file(args.file, words)
+            if os.path.isfile(archivo):
+                logo()
+                show_ok(f"File {args.file} found.")
+                load_file(args.file, words)
+            else:
+                show_error(f"File {args.file} not found.")
+                sys.exit(1)
+
+            sys.exit(0)
         else:
-            show_error(f"File {args.file} not found.")
-            sys.exit(1)
-
-        sys.exit(0)
+            parser.print_help()
     else:
-        show_error("Missing arguments.")
+        parser.print_help()
     
 
 # logo()
