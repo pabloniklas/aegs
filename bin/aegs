@@ -470,6 +470,7 @@ LATEX1
     [ -z "$TEACHER_NAME" ] && showWarning "Teacher's name is blank."
     [ -z "$EXAM_DATE" ] && showWarning "Exam date is blank."
     [ -z "$COURSE_TITLE" ] && showWarning "Curse Title is blank."
+    EXAM_DATE=`echo $EXAM_DATE|sed 's/\//./g'`
     sed -i "s/%%TEACHER_NAME%%/$TEACHER_NAME/;s/%%EXAM_DATE%%/$EXAM_DATE/;s/%%COURSE_TITLE%%/$COURSE_TITLE/" exam_01_$$.tex
     [ -z "$EXAM_TYPE" ] && showWarning "Exam Type is blank."
     [ -z "$LOGO_PATH" ] && showWarning "Logo Path is blank."
