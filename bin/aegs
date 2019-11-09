@@ -905,12 +905,22 @@ function listplugins() {
     TMPFILE=/tmp/$$.plugin
     PLUGINDIR=`dirname $0`/../plugins
 
-    PLCOUNT=`ls $PLUGINDIR/*.sh|wc -l`
+    PLCOUNT=`ls $PLUGINDIR/*.sh  $PLUGINDIR/*.py|wc -l`
 
-    for P in $(ls $PLUGINDIR|grep .sh); do
-        PNAME=`grep '# NAME' $PLUGINDIR/$P|cut -d: -f2`
-        PAUTHOR=`grep '# AUTHOR' $PLUGINDIR/$P|cut -d: -f2`
-        PDESCRIPTION=`grep '# DESCRIPTION' $PLUGINDIR/$P|cut -d: -f2`
+    for P in $(ls $PLUGINDIR/*.sh  $PLUGINDIR/*.py); do
+        PNAME=`grep '# NAME' $P|cut -d: -f2`
+        PAUTHOR=`grep '# AUTHOR' $P|cut -d: -f2`
+        PDESCRIPTION=`grep '# DESCRIPTION' $P|cut -d: -f2`
+
+        # We cut the description if longer than 50 chars.
+        if [ ${#PDESCRIPTION} -gt 50 ]; then
+            PDESCRIPTION=${PDESCRIPTION:1:50}
+            PDESCRIPTION=${PDESCRIPTION%???}...
+        fi
+
+        PNAME=${PNAME:-"UNKNOWN"}
+        PAUTHOR=${PAUTHOR:-"UNKNOWN"}
+        PDESCRIPTION=${PDESCRIPTION:-"UNKNOWN"}
 
         echo "$PNAME;$PAUTHOR;$PDESCRIPTION" >> $TMPFILE
     done
@@ -961,9 +971,12 @@ for (( I=0; I <${#DB_PATH[@]} ; I++)); do
     DBTABLES+=("`echo ${DB_PATH[$I]}|cut -d/ -f2`")
 done
 
+
+
 # ARG processing
 while [ ! -z "$1" ]; do
     case "x$1" in 
+
         "x-plugin") shift
                     [[ "$1" =~ (^[a-z]*[A-Z]*) ]] && PLUGIN_NAME=${BASH_REMATCH[1]}
                     [[ "$1" =~ :(.*) ]] && OPTS=${BASH_REMATCH[1]}
@@ -987,7 +1000,7 @@ while [ ! -z "$1" ]; do
         "x-create-exam")
                     FLAG=
                     shift
-                    while [ ! -z "$1" ]; do
+                    while [ ! -z "$1" ]; do     #TODO: que no procese el resto de los argumentos!!!
                         case "x$1" in
                             "x-u")  shift
                                     UNITS="$1"
