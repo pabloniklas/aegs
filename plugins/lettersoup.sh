@@ -80,6 +80,7 @@ function soup2latex() {
 
     local ORIENT
     local A
+    local AUX
     local TEX_OUTPUT
 
     TEX_OUTPUT="$1"
@@ -91,7 +92,8 @@ function soup2latex() {
     echo "" >> $TEX_OUTPUT
     echo '\section{Sopa de Letras}' >> $TEX_OUTPUT
     echo '\question[30] Resolver la sopa de letras. Se deben hallar las ' >> $TEX_OUTPUT
-    echo ${#WORDS[@]}  >> $TEX_OUTPUT
+    AUX=${WORDS//,/ }
+    echo ${#AUX[@]}  >> $TEX_OUTPUT
     echo "palabras que se encuentran perdidas." >> $TEX_OUTPUT
     echo 'Las mismas tienen relación con conceptos que se evaluan en el presente examen.' >> $TEX_OUTPUT
 
