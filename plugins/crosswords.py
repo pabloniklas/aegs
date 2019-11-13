@@ -19,6 +19,7 @@
 # 14/10/2019 - PSRN - Initial version.
 # 31/10/2019 - PSRN - First working version.
 # 01/11/2019 - PSRN - Args support.
+# 12/11/2019 - PSRN - Managing exception during definition loading.
 #
 #######################################################################
 # PLUGIN DETAILS
@@ -93,14 +94,20 @@ def load_file(file, words):
 
     show_info("Loading definitions from '" + file + "'.")
 
-    with open(file) as csvfile:
-        readCSV = csv.reader(csvfile, delimiter=':')
-        for row in readCSV:
-            definition = row[1]
-            keyword = row[0]
-            words[keyword] = definition
+    try:
+        with open(file) as csvfile:
+            readCSV = csv.reader(csvfile, delimiter=':')
+            for row in readCSV:
+                definition = row[1]
+                keyword = row[0]
+                words[keyword] = definition
 
-            show_info("   '"+keyword+"' => "+definition)
+                show_info("   '"+keyword+"' => "+definition)
+    except:
+        e=sys.exc_info()[0]
+        show_error(f"load_file(): {e}")
+        sys.exit(2)
+
 
     show_ok("Done.")
 
@@ -311,11 +318,12 @@ def create_crossword(matrix, words):
 
     print_matrix(matrix)
     
-def appendFile(file, texto):
+def append_file(file, texto):
     try:
         open(file, "a+b").write(bytes(texto + "\r\n", "utf-8"))
-    except (OSError, IOError):
-        show_error("appendFile(): Hubo un error.")
+    except:
+        e=sys.exc_info()[0]
+        show_error(f"append_file(): {e}.")
 
 # MAIN
 import argparse
