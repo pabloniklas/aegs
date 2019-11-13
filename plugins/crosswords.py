@@ -169,38 +169,50 @@ def letter_frecuency(test_str):
     show_info("Count of all characters in "+test_str+" is: " + str(all_freq))
 
 def latex_headers():
-    return ("\\usepackage[unboxed]{cwpuzzle}")
+    return (r"\usepackage[unboxed]{cwpuzzle}")
 
-def latex_body():
+def latex_body(matrix):
 
     body=[]
     
-    body.append("\\begin{Puzzle}{16}{12}")
-    #         |{}   |[1]O |[2]P |E  |R     |A  |T     |I  |O    |N  |{}    |{}   |[3]B |{} |{} |{} |.
-    #         |{}   |{}   |L    |{} |{}    |{} |{}    |{} |{}   |{} |{}    |[4]R |A    |N  |G  |E  |.
-    #         |[5]E |{}   |A    |{} |[6]M  |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
-    #         |S    |{}   |[7]C |O  |O     |R  |D     |I  |N    |A  |T     |E    |G    |R  |I  |D  |.
-    #         |T    |{}   |E    |{} |D     |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
-    #         |I    |{}   |V    |{} |E     |{} |{}    |{} |[8]V |A  |R     |I    |A    |B  |L  |E  |.
-    #         |[9]M |E    |A    |N  |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |P    |{} |{} |{} |.
-    #         |A    |{}   |L    |{} |[10]L |I  |N     |E  |G    |R  |[11]A |P    |H    |{} |{} |{} |.
-    #         |T    |{}   |U    |{} |{}    |{} |{}    |{} |{}   |{} |X     |{}   |{}   |{} |{} |{} |.
-    #         |I    |{}   |E    |{} |{}    |{} |[12]S |C  |A    |L  |E     |M    |O    |D  |E  |L  |.
-    #         |O    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |S     |{}   |{}   |{} |{} |{} |.
-    #         |N    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |{}   |{} |{} |{} |.
-    body.append("\\end{Puzzle}")
-        
-    body.append("\\begin{PuzzleClues}{\textbf{Across}}")
-    #         \Clue{1}{OPERATION}{Any mathematical process}
-    #         \Clue{4}{RANGE}{The lowest value in a set of numbers through the highest value in the set}
-    #         \Clue{7}{COORDINATEGRID}{A network of lines used for locating points}
-    #         \Clue{8}{VARIABLE}{Any symbol that could represent a number}
-    #         \Clue{9}{MEAN}{Average}
-    #         \Clue{10}{LINEGRAPH}{Graph that displays data using line segments}
-    #         \Clue{12}{SCALEMODEL}{A model or drawing based on a ratio}
-    body.append("\\end{PuzzleClues}")
+    size=len(matrix)
+    
+    body.append(r"\begin{Puzzle}{"+str(size)+"}{"+str(size)+"}")
+    
+    for x in matrix:
+        text=''.join([(r"/{"+str(elem)+"}" if elem is not "." else "/{}") for elem in x])
+        body.append(text+'/.')
+    
 
-    return ""
+            #  |{}   |[1]O |[2]P |E  |R     |A  |T     |I  |O    |N  |{}    |{}   |[3]B |{} |{} |{} |.
+            #  |{}   |{}   |L    |{} |{}    |{} |{}    |{} |{}   |{} |{}    |[4]R |A    |N  |G  |E  |.
+            #  |[5]E |{}   |A    |{} |[6]M  |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
+            #  |S    |{}   |[7]C |O  |O     |R  |D     |I  |N    |A  |T     |E    |G    |R  |I  |D  |.
+            #  |T    |{}   |E    |{} |D     |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
+            #  |I    |{}   |V    |{} |E     |{} |{}    |{} |[8]V |A  |R     |I    |A    |B  |L  |E  |.
+            #  |[9]M |E    |A    |N  |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |P    |{} |{} |{} |.
+            #  |A    |{}   |L    |{} |[10]L |I  |N     |E  |G    |R  |[11]A |P    |H    |{} |{} |{} |.
+            #  |T    |{}   |U    |{} |{}    |{} |{}    |{} |{}   |{} |X     |{}   |{}   |{} |{} |{} |.
+            #  |I    |{}   |E    |{} |{}    |{} |[12]S |C  |A    |L  |E     |M    |O    |D  |E  |L  |.
+            #  |O    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |S     |{}   |{}   |{} |{} |{} |.
+            #  |N    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |{}   |{} |{} |{} |.
+    
+    body.append(r"\end{Puzzle}")
+        
+    body.append(r"\begin{PuzzleClues}{\textbf{Across}}")
+            #  \Clue{1}{OPERATION}{Any mathematical process}
+            #  \Clue{4}{RANGE}{The lowest value in a set of numbers through the highest value in the set}
+            #  \Clue{7}{COORDINATEGRID}{A network of lines used for locating points}
+            #  \Clue{8}{VARIABLE}{Any symbol that could represent a number}
+            #  \Clue{9}{MEAN}{Average}
+            #  \Clue{10}{LINEGRAPH}{Graph that displays data using line segments}
+            #  \Clue{12}{SCALEMODEL}{A model or drawing based on a ratio}
+    body.append(r"\end{PuzzleClues}")
+
+
+    print_matrix(body)
+
+    return body
 
 def latex_footer():
     return ""
@@ -349,6 +361,8 @@ if __name__ == "__main__":
                 load_file(args.file, words)
                 m = create_matrix(20)
                 create_crossword(m, words)
+                latex_body(m)
+                latex_footer()
             else:
                 show_error(f"File {args.file} not found.")
                 sys.exit(1)
