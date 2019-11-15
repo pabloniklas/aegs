@@ -20,6 +20,7 @@
 # 31/10/2019 - PSRN - First working version.
 # 01/11/2019 - PSRN - Args support.
 # 12/11/2019 - PSRN - Managing exception during definition loading.
+# 14/11/2019 - PSRN - LaTeX argument.
 #
 #######################################################################
 # PLUGIN DETAILS
@@ -183,7 +184,6 @@ def latex_body(matrix):
         text=''.join([(r"/{"+str(elem)+"}" if elem is not "." else "/{}") for elem in x])
         body.append(text+'/.')
     
-
             #  |{}   |[1]O |[2]P |E  |R     |A  |T     |I  |O    |N  |{}    |{}   |[3]B |{} |{} |{} |.
             #  |{}   |{}   |L    |{} |{}    |{} |{}    |{} |{}   |{} |{}    |[4]R |A    |N  |G  |E  |.
             #  |[5]E |{}   |A    |{} |[6]M  |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
@@ -208,7 +208,6 @@ def latex_body(matrix):
             #  \Clue{10}{LINEGRAPH}{Graph that displays data using line segments}
             #  \Clue{12}{SCALEMODEL}{A model or drawing based on a ratio}
     body.append(r"\end{PuzzleClues}")
-
 
     print_matrix(body)
 
@@ -310,7 +309,6 @@ def create_crossword(matrix, words):
                     show_info(f"{w}: Orientation (-)")
                     Xi = x+posL-1
                     Yi = y-posW
-#                    show_info(f"Initial coors: Xi={Xi} (x={x}, posW={posW}), Yi={Yi} (y={y}, posL={posL})")
                     show_info(f"{w}: Choosen row: {posW}")
                     X = Xi+1
                     for n in range(Yi,Yi+len(s2)):
@@ -322,8 +320,6 @@ def create_crossword(matrix, words):
                             show_ok(f"{w}: Coors accepted: ({X},{Y})")
                         else:
                             show_warning(f"{w}: Coors rejected: ({X},{Y})")
-                    
-                            
 
         else:
             show_info(f"{w}: It won't be processed. It's the longest word.")
@@ -345,12 +341,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="crossword.py", description="CrossWord plugin for AEGS. - By Pablo Niklas <pablo.niklas@gmail.com>")
     
     parser.add_argument('-f', '--file', help='File to load the definitions from.', required='--create' in sys.argv)
+    parser.add_argument('-l', '--latex', help='Creates latex output.', action='store_true', default=False, required='--create' in sys.argv)
     parser.add_argument('-c', '--create', help="Create crossword.", action='store_true', default=False)
 
     args = parser.parse_args()
 
     # Create    
-    if args.create:    
+    if args.create:
+        
         if args.file:
     
             archivo = args.file
@@ -361,8 +359,9 @@ if __name__ == "__main__":
                 load_file(args.file, words)
                 m = create_matrix(20)
                 create_crossword(m, words)
-                latex_body(m)
-                latex_footer()
+                if args.latex:
+                    latex_body(m)
+                    latex_footer()
             else:
                 show_error(f"File {args.file} not found.")
                 sys.exit(1)
