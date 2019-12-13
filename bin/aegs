@@ -450,7 +450,10 @@ function createMainLaTeX () {
     \vsword{Resultado}
     \vqword{Pregunta}
     \addpoints % required here by exam.cls, even though questions haven't started yet.
-    \gradetable[v][questions]%[pages]  % Use [pages] to have grading table by page instead of question
+    \begin{center}
+        \setlength{\doublerulesep}{0.25in}
+        \multirowgradetable{2}[questions]
+    \end{center}
 
     %\pointtable[h][questions]
     %\end{minipage}
@@ -1176,7 +1179,7 @@ if [ ! -z "$CREATE_EXAMEN" ]; then
     createEndLaTeX
     cat exam_*_$$.tex > exam_$$.tex
     createLaTeX exam_$$.tex
-    mv exam_$$.tex ${EXAM_TYPE/ /_}_`date '++%Y%m%d%H%M%S'`.tex
+    mv exam_$$.tex ${EXAM_TYPE/ /_}_`date '+%Y%m%d%H%M%S'`.tex
     rm -f exam*.tex exam*.aux exam*.log exam*.synctex.gz *.listing
 fi
 
