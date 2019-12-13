@@ -5,3 +5,7 @@ JSON/
 bin/CQstats.db
 pictures/*
 *data.txt*
+plugins/crossword.txt
+.vscode/ 
+plugins/.idea/
+
