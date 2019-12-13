@@ -20,7 +20,6 @@
 # 31/10/2019 - PSRN - First working version.
 # 01/11/2019 - PSRN - Args support.
 # 12/11/2019 - PSRN - Managing exception during definition loading.
-# 14/11/2019 - PSRN - LaTeX argument.
 #
 #######################################################################
 # PLUGIN DETAILS
@@ -170,48 +169,38 @@ def letter_frecuency(test_str):
     show_info("Count of all characters in "+test_str+" is: " + str(all_freq))
 
 def latex_headers():
-    return (r"\usepackage[unboxed]{cwpuzzle}")
+    return ("\\usepackage[unboxed]{cwpuzzle}")
 
-def latex_body(matrix):
+def latex_body():
 
     body=[]
     
-    size=len(matrix)
-    
-    body.append(r"\begin{Puzzle}{"+str(size)+"}{"+str(size)+"}")
-    
-    for x in matrix:
-        text=''.join([(r"/{"+str(elem)+"}" if elem is not "." else "/{}") for elem in x])
-        body.append(text+'/.')
-    
-            #  |{}   |[1]O |[2]P |E  |R     |A  |T     |I  |O    |N  |{}    |{}   |[3]B |{} |{} |{} |.
-            #  |{}   |{}   |L    |{} |{}    |{} |{}    |{} |{}   |{} |{}    |[4]R |A    |N  |G  |E  |.
-            #  |[5]E |{}   |A    |{} |[6]M  |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
-            #  |S    |{}   |[7]C |O  |O     |R  |D     |I  |N    |A  |T     |E    |G    |R  |I  |D  |.
-            #  |T    |{}   |E    |{} |D     |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
-            #  |I    |{}   |V    |{} |E     |{} |{}    |{} |[8]V |A  |R     |I    |A    |B  |L  |E  |.
-            #  |[9]M |E    |A    |N  |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |P    |{} |{} |{} |.
-            #  |A    |{}   |L    |{} |[10]L |I  |N     |E  |G    |R  |[11]A |P    |H    |{} |{} |{} |.
-            #  |T    |{}   |U    |{} |{}    |{} |{}    |{} |{}   |{} |X     |{}   |{}   |{} |{} |{} |.
-            #  |I    |{}   |E    |{} |{}    |{} |[12]S |C  |A    |L  |E     |M    |O    |D  |E  |L  |.
-            #  |O    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |S     |{}   |{}   |{} |{} |{} |.
-            #  |N    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |{}   |{} |{} |{} |.
-    
-    body.append(r"\end{Puzzle}")
+    body.append("\\begin{Puzzle}{16}{12}")
+    #         |{}   |[1]O |[2]P |E  |R     |A  |T     |I  |O    |N  |{}    |{}   |[3]B |{} |{} |{} |.
+    #         |{}   |{}   |L    |{} |{}    |{} |{}    |{} |{}   |{} |{}    |[4]R |A    |N  |G  |E  |.
+    #         |[5]E |{}   |A    |{} |[6]M  |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
+    #         |S    |{}   |[7]C |O  |O     |R  |D     |I  |N    |A  |T     |E    |G    |R  |I  |D  |.
+    #         |T    |{}   |E    |{} |D     |{} |{}    |{} |{}   |{} |{}    |{}   |R    |{} |{} |{} |.
+    #         |I    |{}   |V    |{} |E     |{} |{}    |{} |[8]V |A  |R     |I    |A    |B  |L  |E  |.
+    #         |[9]M |E    |A    |N  |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |P    |{} |{} |{} |.
+    #         |A    |{}   |L    |{} |[10]L |I  |N     |E  |G    |R  |[11]A |P    |H    |{} |{} |{} |.
+    #         |T    |{}   |U    |{} |{}    |{} |{}    |{} |{}   |{} |X     |{}   |{}   |{} |{} |{} |.
+    #         |I    |{}   |E    |{} |{}    |{} |[12]S |C  |A    |L  |E     |M    |O    |D  |E  |L  |.
+    #         |O    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |S     |{}   |{}   |{} |{} |{} |.
+    #         |N    |{}   |{}   |{} |{}    |{} |{}    |{} |{}   |{} |{}    |{}   |{}   |{} |{} |{} |.
+    body.append("\\end{Puzzle}")
         
-    body.append(r"\begin{PuzzleClues}{\textbf{Across}}")
-            #  \Clue{1}{OPERATION}{Any mathematical process}
-            #  \Clue{4}{RANGE}{The lowest value in a set of numbers through the highest value in the set}
-            #  \Clue{7}{COORDINATEGRID}{A network of lines used for locating points}
-            #  \Clue{8}{VARIABLE}{Any symbol that could represent a number}
-            #  \Clue{9}{MEAN}{Average}
-            #  \Clue{10}{LINEGRAPH}{Graph that displays data using line segments}
-            #  \Clue{12}{SCALEMODEL}{A model or drawing based on a ratio}
-    body.append(r"\end{PuzzleClues}")
+    body.append("\\begin{PuzzleClues}{\textbf{Across}}")
+    #         \Clue{1}{OPERATION}{Any mathematical process}
+    #         \Clue{4}{RANGE}{The lowest value in a set of numbers through the highest value in the set}
+    #         \Clue{7}{COORDINATEGRID}{A network of lines used for locating points}
+    #         \Clue{8}{VARIABLE}{Any symbol that could represent a number}
+    #         \Clue{9}{MEAN}{Average}
+    #         \Clue{10}{LINEGRAPH}{Graph that displays data using line segments}
+    #         \Clue{12}{SCALEMODEL}{A model or drawing based on a ratio}
+    body.append("\\end{PuzzleClues}")
 
-    print_matrix(body)
-
-    return body
+    return ""
 
 def latex_footer():
     return ""
@@ -309,6 +298,7 @@ def create_crossword(matrix, words):
                     show_info(f"{w}: Orientation (-)")
                     Xi = x+posL-1
                     Yi = y-posW
+#                    show_info(f"Initial coors: Xi={Xi} (x={x}, posW={posW}), Yi={Yi} (y={y}, posL={posL})")
                     show_info(f"{w}: Choosen row: {posW}")
                     X = Xi+1
                     for n in range(Yi,Yi+len(s2)):
@@ -320,6 +310,8 @@ def create_crossword(matrix, words):
                             show_ok(f"{w}: Coors accepted: ({X},{Y})")
                         else:
                             show_warning(f"{w}: Coors rejected: ({X},{Y})")
+                    
+                            
 
         else:
             show_info(f"{w}: It won't be processed. It's the longest word.")
@@ -341,14 +333,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="crossword.py", description="CrossWord plugin for AEGS. - By Pablo Niklas <pablo.niklas@gmail.com>")
     
     parser.add_argument('-f', '--file', help='File to load the definitions from.', required='--create' in sys.argv)
-    parser.add_argument('-l', '--latex', help='Creates latex output.', action='store_true', default=False, required='--create' in sys.argv)
     parser.add_argument('-c', '--create', help="Create crossword.", action='store_true', default=False)
 
     args = parser.parse_args()
 
     # Create    
-    if args.create:
-        
+    if args.create:    
         if args.file:
     
             archivo = args.file
@@ -359,9 +349,6 @@ if __name__ == "__main__":
                 load_file(args.file, words)
                 m = create_matrix(20)
                 create_crossword(m, words)
-                if args.latex:
-                    latex_body(m)
-                    latex_footer()
             else:
                 show_error(f"File {args.file} not found.")
                 sys.exit(1)
