@@ -1179,8 +1179,9 @@ if [ ! -z "$CREATE_EXAMEN" ]; then
     createEndLaTeX
     cat exam_*_$$.tex > exam_$$.tex
     createLaTeX exam_$$.tex
-    mv exam_$$.tex ${EXAM_TYPE/ /_}_`date '+%Y%m%d%H%M%S'`.tex
-    rm -f exam*.tex exam*.aux exam*.log exam*.synctex.gz *.listing
+    HHMMSS=`date '+%Y%m%d%H%M%S'`
+    mv exam_$$.tex ${EXAM_TYPE/ /_}_$HHMMSS.tex
+    rm -f ${EXAM_TYPE/ /_}_$HHMMSS.aux ${EXAM_TYPE/ /_}_$HHMMSS.log ${EXAM_TYPE/ /_}_$HHMMSS.synctex.gz *.listing 
 fi
 
 exit 0
