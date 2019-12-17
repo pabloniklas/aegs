@@ -36,6 +36,7 @@
 # 10/10/2019 - PSRN - Plugin support added.
 # 11/10/2019 - PSRN - FULL plugin support.
 # 13/12/2019 - PSRN - Change bkp latex file name.
+# 17/12/2019 - PSRN - createMidLaTeX(): Fixed bug that avoid some questions to be printed correctly.
 #
 
 #######################################################################
@@ -143,8 +144,6 @@ function saveDB {
     for ((A=0; A<${#LABEL[@]}; A++)); do
         UPD_LINE="${LABEL[$A]}:${TEXFILE[$A]}:${QCREM[$A]}:${STATS[$A]}:${FDA[$A]}:${LI[$A]}:${LS[$A]}"
         UPD_LINE="`echo $UPD_LINE|sed 's/\./\\\./g;s/\//\\\\\//g;'`"
-        #ORD=$(($A+1))
-        #echo "s/`printf %.6d $ORD`:.*/$UPD_LINE/" >> sedfile
         echo "s/`printf %.6d $A`:.*/$UPD_LINE/" >> sedfile
     done
 
@@ -420,7 +419,7 @@ function createMainLaTeX () {
     \begin{itemize}
     \item \textbf{LEER los enunciados.}
     \item \textbf{El examen se aprueba con el 60\% del Total de Puntos.}
-    \item \textbf{Usar birome a azul o negra}. No entregar el examen en lápiz.
+    \item \textbf{Usar birome azul o negra}. No entregar el examen en lápiz.
     \item \textbf{Escribir la respuesta final} en el espacio provisto. 
     \item En las preguntas \textit{Multiplechoice}, \textbf{deben marcarse todas las respuestas correctas.}
     \item \textbf{Completar los Nombres y Apellido/s} en \textbf{TODAS} las hojas dadas.
@@ -558,7 +557,7 @@ function calculateFrecuencies()  {
     for ((A=0; A<${#QCREM[@]}; A++)); do
         NUM=${QCREM[$A]}
         [ -z "$NUM" ] && showWarning "En $A NUM es '$NUM'"
-        AUX_PORC=`AUX=$(echo $NUM/$SUM|bc -l) ; LC_NUMERIC="en_US.UTF-8" printf "%0.6f\n" $AUX`
+        AUX_PORC=`AUX=$(echo $NUM/$SUM|bc -l) ; LC_NUMERIC="en_US.UTF-8" printf "%0.12f\n" $AUX`
         STATS[$A]=`echo $AUX_PORC|bc -l`
         SUM_PORC=`echo $SUM_PORC+$AUX_PORC|bc -l`
     done 
@@ -721,7 +720,7 @@ function createMidLaTeX() {
         esac
 
         echo >> exam_02_$$.tex
-        echo $SECTION >> exam_02_$$.tex
+        echo $SECTION >> exam_02_$$.tex # Section title.
         echo >> exam_02_$$.tex
 
         for ((F=0;F<${#CHOOSEN_QUESTIONS[@]};F++)); do
@@ -735,21 +734,26 @@ function createMidLaTeX() {
                 showInfo "   * $FILE"
                 if $SHUFFLE && [[ $T == "multiplechoice" ]]; then
                     showInfo "     (shuffled)"
-                    grep -v '\end' ${TEXFILE[$ID]} | grep -ve '[Cc]hoice' | grep -v checkboxes > $SHUFTMPFILE
+                    grep -v '\\end' ${TEXFILE[$ID]} | grep -vE '\\([Cc]orrect)?[Cc]hoice' | grep -v checkbox  \
+                        | grep -v '\\vspace' | grep -v '\\fill' > $SHUFTMPFILE
 
-                    BEGIN="`grep begin ${TEXFILE[$ID]} | grep check`"
-                    END="`grep end ${TEXFILE[$ID]} | grep check`"
+                    BEGIN="`grep \\begin ${TEXFILE[$ID]} | grep check`"
+                    END="`grep \\end ${TEXFILE[$ID]} | grep check`"
 
+                    # Copy the rest of the file (from sexylisting to its end)
                     if [ ! -z "`grep '{sexylisting}' ${TEXFILE[$ID]}`" ]; then
-                        echo '\end{sexylisting}' >> $SHUFTMPFILE
+                        FB=`grep -ni end{sexylisting} ${TEXFILE[$ID]}|cut -d: -f1`
+                        FE=`wc -l ${TEXFILE[$ID]}|cut -d" " -f1`
+                        TL=$(($FE-$FB+1))
+                        tail -$TL ${TEXFILE[$ID]} | grep -vE '\\([Cc]orrect)?[Cc]hoice' | grep -v checkbox >> $SHUFTMPFILE
+                        #echo '\end{sexylisting}' >> $SHUFTMPFILE
                     fi
 
                     echo $BEGIN >> $SHUFTMPFILE
 
-                    grep -e '[Cc]hoice' ${TEXFILE[$ID]} | shuf >> $SHUFTMPFILE
+                    grep -E '\\([Cc]orrect)?[Cc]hoice' ${TEXFILE[$ID]} | shuf >> $SHUFTMPFILE
 
                     echo $END >> $SHUFTMPFILE
-
                     cat $SHUFTMPFILE >> exam_02_$$.tex
                     rm -f $SHUFTMPFILE
                 else
@@ -822,7 +826,7 @@ if [ ! -f `dirname $0`/aegs.ini ]; then
 
 # Don't leave empty this fields. And don't use "/".
 TEACHER_NAME="Pablo Niklas"
-EXAM_DATE="January 4th, 1974"
+EXAM_DATE="January 4th, 1874"
 COURSE_TITLE="Geography"
 EXAM_TYPE="Elemental test"
 UNIVERSITY="University of United Earth"
@@ -1015,6 +1019,9 @@ while [ ! -z "$1" ]; do
                     showDB 
                     ;;
 
+        "x-init")   initStatFile
+                    ;;
+
         "x-pick")   showHeader
                     initStatFile       # Create the stat file if it doesn't exist.
 
@@ -1178,10 +1185,13 @@ if [ ! -z "$CREATE_EXAMEN" ]; then
     [ ${#PLUGINS[@]} -gt 0 ] && pluginslatex
     createEndLaTeX
     cat exam_*_$$.tex > exam_$$.tex
+    rm -f exam_0{1,2,3}_*.tex
     createLaTeX exam_$$.tex
-    HHMMSS=`date '+%Y%m%d%H%M%S'`
-    mv exam_$$.tex ${EXAM_TYPE/ /_}_$HHMMSS.tex
-    rm -f ${EXAM_TYPE/ /_}_$HHMMSS.aux ${EXAM_TYPE/ /_}_$HHMMSS.log ${EXAM_TYPE/ /_}_$HHMMSS.synctex.gz *.listing 
+    HHMMSS="`date '+%Y%m%d%H%M%S'`"
+    mv exam_$$.tex ${EXAM_TYPE/ /_}_${HHMMSS}.tex
+    mv exam_$$.pdf ${EXAM_TYPE/ /_}_${HHMMSS}.pdf
+    
+    rm -f *.aux *.log *.synctex.gz *.listing 
 fi
 
 exit 0
