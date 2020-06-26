@@ -10,6 +10,9 @@
             /:/  /       \:\__\        \::/  /       \::/  /
             \/__/         \/__/         \/__/         \/__/
 
+<img src=https://img.shields.io/github/license/pabloniklas/aegs>
+<img src=https://img.shields.io/github/v/release/pabloniklas/aegs>
+<img src=https://img.shields.io/github/languages/top/pabloniklas/aegs>
 
 
 # An Exam Generation System
