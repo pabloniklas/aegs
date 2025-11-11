@@ -37,6 +37,7 @@
 # 11/10/2019 - PSRN - FULL plugin support.
 # 13/12/2019 - PSRN - Change bkp latex file name.
 # 17/12/2019 - PSRN - createMidLaTeX(): Fixed bug that avoid some questions to be printed correctly.
+# 10/11/2025 - PSRN - Several fixes.
 #
 
 #######################################################################
