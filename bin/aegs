@@ -223,21 +223,14 @@ function initStatFile() {
 
 ### updateStats
 function updateStats () {
-
-    local QUESTION_ID
-
-    QUESTION_ID=${1//0/}
-
-    if [ -z "$QUESTION_ID" ]; then 
-        showWarning "QUESTION_ID is empty."
-        showError "Stats NOT updated."
-    else
-        showInfo "About to update register $QUESTION_ID."
-
-        QCREM[$QUESTION_ID]=$((${QCREM[$QUESTION_ID]}-1))       # One less.
-
-        showOK "Stats updated successfully."
-    fi  
+  local QUESTION_ID="${1##+(0)}"  # solo ceros a la izquierda
+  if [ -z "$QUESTION_ID" ]; then
+    showWarning "QUESTION_ID is empty."
+    showError "Stats NOT updated."
+    return 1
+  fi
+  QCREM[$QUESTION_ID]=$(( QCREM[$QUESTION_ID] - 1 ))
+  showOK "Stats updated successfully."
 }
 
 ### pickQ
@@ -246,7 +239,7 @@ function pickQ () {
     MY_PATH="`dirname $0`"
 
     QTB=${#DB_PATH[@]}
-    CTB=`myRandom 1 $QTB`
+    CTB=`myRandom 0 $QTB`
     CUN=`myRandom 1 $QUNITS`
     QQ=`ls $MY_PATH/${DB_PATH[$CTB]}/*.tex 2>/dev/null | wc -l`
     QU=`ls $MY_PATH/${DB_PATH[$CTB]}/\`printf %.2d $CUN\`??.tex 2>/dev/null | wc -l`
@@ -268,10 +261,26 @@ function pickQ () {
     showInfo "Content of question #$CQ of table #$CTB (${DB_PATH[$CTB]}):"
     QFILE="${DB_PATH[$CTB]}/`printf %.2d%.2d $CUN $CQ`.tex"
 
-    cat $QFILE
-
+    cat "$QFILE"
+    
     echo
-    updateStats $CQ
+    # Encontrar el ID global que corresponde al archivo elegido
+    FULL_QFILE="$(dirname "$0")/$QFILE"
+    ID_INDEX=-1
+    for ((I=0; I<${#TEXFILE[@]}; I++)); do
+        if [[ "${TEXFILE[$I]}" == "$FULL_QFILE" ]]; then
+            ID_INDEX=$I
+            break
+        fi
+    done
+    
+    if [ $ID_INDEX -ge 0 ]; then
+        # Podés pasar la etiqueta con ceros o el índice; updateStats ya quita ceros a la izquierda
+        updateStats "$(printf %.6d $ID_INDEX)"   # o: updateStats "${LABEL[$ID_INDEX]}"
+    else
+        showWarning "No se encontró ID global para $FULL_QFILE; stats NO actualizadas."
+    fi
+
 }
 
 ### createMainLaTeX
@@ -643,27 +652,42 @@ function chooseQuestions() {
                 # Getting the frequencies for the questions.
                 showInfo "Locating limits."
 
-                for ((I=0; I<${#QUESTIONS_POOL[@]}; I++)) ; do
-                    
-                    QC=${QUESTIONS_POOL[$I]}
-                    QC=${QC##+(0)}    # Stripping '^0's
-                    LSC[$I]=${LS[$QC]}
-                    LIC[$I]=${LI[$QC]}
-                    [ ${LI[$QC]} -lt $LIa ] && LIa=${LI[$QC]}     # Min
-                    [ ${LS[$QC]} -gt $LSa ] && LSa=${LS[$QC]}     # Max
-                    
+                # --- CDF LOCAL 1..10000 PARA ESTE POOL ---
+                unset LIC LSC
+                local totalW=0
+                for ((i=0;i<${#QUESTIONS_POOL[@]};i++)); do
+                  id=${QUESTIONS_POOL[$i]##+(0)}
+                  totalW=$(( totalW + ${QCREM[$id]} ))
                 done
+                
+                local acc=0
+                for ((i=0;i<${#QUESTIONS_POOL[@]};i++)); do
+                  id=${QUESTIONS_POOL[$i]##+(0)}
+                  frac=$(echo "${QCREM[$id]} / $totalW" | bc -l)
+                  acc=$(echo "$acc + $frac" | bc -l)
+                  LSC[$i]=$(printf "%.0f" "$(echo "$acc * 10000" | bc -l)")
+                  if [ $i -eq 0 ]; then
+                    LIC[$i]=1
+                  else
+                    LIC[$i]=$(( ${LSC[$((i-1))]} + 1 ))
+                  fi
+                done
+                
+                LIa=1; LSa=10000
+                showInfo "CDF local armada para ${#QUESTIONS_POOL[@]} ítems."
 
-                showInfo "Limits: $LIa -- $LSa"     
 
                 showInfo "------------------------------------------------------------"
 
-                CUCU=1
+                CUCU=0
+                POOL_SZ=${#QUESTIONS_POOL[@]}
+                declare -a POOL_PICKS
                 while [ $CUCU -le $QQ ]; do
                     RAND=`myRandom $LIa $LSa`
 
                     # Locating the random in the correct range for the question.
-                    A=0; while [ $A -lt $QQ ]; do
+                    POOL_SZ=${#QUESTIONS_POOL[@]}
+                    A=0; while [ $A -lt $POOL_SZ ]; do
                         [ $RAND -ge ${LIC[$A]} ] && [ $RAND -le ${LSC[$A]} ] && break 
                         A=$(($A+1))
                     done
@@ -684,6 +708,20 @@ function chooseQuestions() {
                         showWarning "Question already choosen. Repeating."
                     fi
                 done
+                # --- MÁS PESO A LAS NO ELEGIDAS DEL POOL ---
+                INC_NOT_SELECTED=${INC_NOT_SELECTED:-1}  # podés definirlo globalmente
+                for ((i=0;i<POOL_SZ;i++)); do
+                  id="${QUESTIONS_POOL[$i]}"
+                  found=
+                  for pick in "${POOL_PICKS[@]}"; do
+                    [ "$id" = "$pick" ] && found=1 && break
+                  done
+                  if [ -z "$found" ]; then
+                    idx="${id##+(0)}"
+                    QCREM[$idx]=$(( QCREM[$idx] + INC_NOT_SELECTED ))
+                  fi
+                done
+
             fi
         done
     done
